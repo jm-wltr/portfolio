@@ -1,0 +1,40 @@
+#links ul {
+    list-style: none;
+    padding-left: 1rem;
+}
+
+#links li {
+    margin-top: 0.5rem;
+    align-items: center;
+    position: relative;
+    padding-left: 2rem;
+    padding-bottom: 0.2rem;
+    margin-bottom: 0.5rem;
+}
+
+
+#links li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+li.linkedin::before {
+    background-image: url("/assets/images/icons/linkedin.svg");
+}
+
+li.github::before {
+    background-image: url("/assets/images/icons/github.svg");
+}
+
+li.algo::before {
+    background-image: url("/assets/images/icons/algowhite.svg");
+}
+
+li.stackoverflow::before {
+    background-image: url("/assets/images/icons/stackoverflow.svg");
+}

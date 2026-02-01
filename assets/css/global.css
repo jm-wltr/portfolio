@@ -1,0 +1,356 @@
+/* ------------ FONTS ------------*/
+
+@font-face {
+    font-family: "Europa Grotesk SH";
+    src: url('../fonts/europa-grotesk-sh-bold-webfont.woff2') format('woff2'),
+        url('../fonts/europa-grotesk-sh-bold-webfont.woff') format('woff');
+}
+
+@font-face {
+    font-family: "Roboto Regular";
+    src: url('../fonts/roboto-regular-webfont.woff2') format('woff2'),
+        url('../fonts/roboto-regular-webfont.woff') format('woff2');
+}
+
+
+@font-face {
+    font-family: "Cascadia";
+    src: url('../fonts/cascadia-webfont.woff2') format('woff2'),
+        url('../fonts/cascadia-webfont.woff') format('woff');
+    font-display: swap;
+}
+
+/* ------------ GLOBAL SETTINGS ------------*/
+
+body {
+    margin: 0;
+    color: var(--text-primary);
+    background-color: var(--bg-primary);
+    font-family: "Roboto Regular", sans-serif;
+    padding: 20px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: "Europa Grotesk SH", sans-serif, monospace;
+    /* Feel free to change to uppercase or something. Check cool variations*/
+    margin-top: 1.9rem;
+    margin-bottom: 0.5rem;
+    text-transform: none;
+}
+
+h1 {
+    font-size: 2.5rem;
+}
+
+h2 {
+    font-size: 2rem;
+}
+
+h3 {
+    font-size: 1.75rem;
+}
+
+h4 {
+    font-size: 1.5rem;
+}
+
+h5 {
+    font-size: 1.25rem;
+}
+
+h6 {
+    font-size: 1rem;
+}
+
+
+a {
+    color: var(--link-color);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--link-hover);
+    text-decoration: underline;
+}
+
+hr {
+    margin-left: 0;
+    height: thin;
+    border: thin solid var(--border);
+    width: 100%;
+}
+
+table {
+    border-spacing: 0;
+    background: var(--bg-secondary);
+    border-radius: 10px;
+    width: 100%;
+    margin: 1rem 0rem 1rem 0rem;
+}
+
+thead th {
+    /* Headers are slightly lighter than rest of table */
+    background: var(--bg-secondary);
+    font-weight: 600;
+    text-align: left;
+    padding: 1rem;
+    font-size: 1rem;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border);
+}
+
+tbody td {
+    padding: 0.8rem 1rem;
+    font-weight: 400;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.project-year {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 0.2rem;
+}
+
+table a.name-col::after {
+    content: attr(data-year);
+    display: block;
+    font-size: 0.75rem;
+    color: var(--color-primary-text-faded-1);
+    margin-top: 0.2rem;
+}
+
+table .tags-mobile {
+    /* Hide on regular, show on small media */
+    display: none;
+    margin-top: 0.2rem;
+}
+
+@media (max-width: 800px) {
+
+    div.name-and-year {
+        margin-left: 2px;
+    }
+
+    table .tags-col {
+        display: none;
+    }
+
+    table .tags-mobile {
+        display: inline-block;
+    }
+
+    .project-year {
+        margin-bottom: 0.4rem;
+    }
+}
+
+table .tag {
+    font-size: 0.7rem;
+}
+
+
+tbody tr {
+    transition: background 0.3s ease;
+}
+
+tbody tr:hover,
+tbody tr:nth-child(even):hover {
+    background: var(--code-bg);
+}
+
+tbody td a {
+    transition: color 0.2s ease;
+}
+
+tbody td a:hover {
+    color: var(--accent-hover);
+}
+
+/* Optional: striped rows */
+tbody tr:nth-child(even) {
+    background: transparent;
+}
+
+/* Rounded first and last cells in header and body */
+thead th:first-child {
+    border-top-left-radius: 10px;
+}
+
+thead th:last-child {
+    border-top-right-radius: 10px;
+}
+
+tbody tr:last-child td:first-child {
+    border-bottom-left-radius: 10px;
+}
+
+tbody tr:last-child td:last-child {
+    border-bottom-right-radius: 10px;
+}
+
+
+blockquote {
+    position: relative;
+    padding: 1.8rem 1.5rem 1rem 1.5rem;
+    margin: 1.5rem 0;
+    background-color: var(--bg-secondary);
+    font-style: italic;
+    line-height: 1.4rem;
+    border-radius: 8px;
+}
+
+blockquote::before {
+    content: "\"";
+    position: absolute;
+    top: 0.7rem;
+    left: 0.5rem;
+    font-size: 4rem;
+    color: var(--text-muted);
+    line-height: 1;
+    pointer-events: none;
+}
+
+/* left accent bar */
+blockquote::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 4px;
+    background-color: var(--accent);
+    border-radius: 8px 0 0 8px;
+}
+
+blockquote cite {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+}
+
+
+/* ------------ SECTION CONTENT ------------*/
+
+main,
+footer {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Each section stacked vertically */
+section {
+    width: 100%;
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+section.header {
+    margin-top: 2rem;
+}
+
+
+#project-table span.tag {
+    padding: 3px 8px;
+    border-radius: 4px;
+    background-color: var(--code-bg);
+    border: 1px solid var(--border);
+    display: inline-block;
+    margin: 0.1rem 0.2rem;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+#project-table span.tag.ai {
+    background-color: #4463ff;
+    color: #ffffff;
+    border-color: #3352dd;
+}
+
+#project-table span.tag.research {
+    background-color: #9b59b6;
+    color: #ffffff;
+    border-color: #8e44ad;
+}
+
+#project-table span.tag.software {
+    background-color: #2ecc71;
+    color: #ffffff;
+    border-color: #27ae60;
+}
+
+#project-table span.tag.hardware {
+    background-color: #d0851c;
+    color: #ffffff;
+    border-color: #bb610d;
+}
+
+#project-table span.tag.flames {
+    text-shadow:
+        0 0 5px #000000,
+        0 0 10px #000000,
+        0 0 10px #000000,
+        0 0 15px #000000,
+        0 0 15px #000000;
+    background:
+        linear-gradient(rgba(0, 0, 0, 0.35)),
+        url("../images/fire.gif") center/cover no-repeat;
+    background-position: bottom center;
+    text-align: center;
+    border-color: #282828;
+}
+
+#project-table span.tag.PCBs {
+    background-color: #027206;
+    color: #ffffff;
+    border-color: #044700;
+}
+
+#project-table span.tag.firmware {
+    background-color: #228fbd;
+    color: #ffffff;
+    border-color: #1aa08e;
+}
+
+/* ------------ FOOTER CONTENT ------------*/
+
+
+/* Footer styling */
+footer {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+}
+
+footer section {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+footer a.soft {
+    color: var(--text-muted);
+}
+
+footer section p:first-of-type {
+    margin: 1.3rem 0 0.3rem 0;
+}
+
+footer p {
+    color: var(--text-muted);
+    margin: 0.3rem 0 0.3rem 0;
+    font-size: 0.9rem;
+}
