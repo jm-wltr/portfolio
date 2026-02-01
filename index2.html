@@ -18,7 +18,7 @@
         .plasma-header {
             position: relative;
             width: 100%;
-            height: 180px;
+            height: 140px;
             /* Approx 10-12 lines of text */
             overflow: hidden;
             border-bottom: 1px solid #333;
@@ -63,6 +63,44 @@
                 1px -1px 0 #000, -1px 1px 0 #000,
                 1px 1px 0 #000;
         }
+
+        /* Responsive Switching */
+        .ascii-art-full {
+            display: block;
+        }
+
+        .ascii-art-split {
+            display: none;
+            text-align: center;
+        }
+
+        @media (max-width: 900px) {
+            .plasma-header {
+                height: 224px;
+                /* Increase to ~24 rows */
+            }
+
+            .header-overlay {
+                align-items: flex-start;
+                padding-top: 14px;
+            }
+
+            .ascii-name {
+                font-size: 12px;
+                /* Reduce size to fit WALTER on mobile */
+            }
+
+            .ascii-art-full {
+                display: none;
+            }
+
+            .ascii-art-split {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 2rem;
+            }
+        }
     </style>
 </head>
 
@@ -74,7 +112,8 @@
 
         <!-- Layer 2: The Static Name -->
         <div class="header-overlay">
-            <pre class="ascii-name">
+            <!-- Desktop: Single Line -->
+            <pre class="ascii-name ascii-art-full">
      ██╗ █████╗ ██╗███╗   ███╗███████╗      ██╗    ██╗ █████╗ ██╗  ████████╗███████╗██████╗ 
      ██║██╔══██╗██║████╗ ████║██╔════╝      ██║    ██║██╔══██╗██║  ╚══██╔══╝██╔════╝██╔══██╗
      ██║███████║██║██╔████╔██║█████╗        ██║ █╗ ██║███████║██║     ██║   █████╗  ██████╔╝
@@ -82,6 +121,26 @@
 ╚█████╔╝██║  ██║██║██║ ╚═╝ ██║███████╗      ╚███╔███╔╝██║  ██║███████╗██║   ███████╗██║  ██║
  ╚════╝ ╚═╝  ╚═╝╚═╝╚═╝     ╚═╝╚══════╝       ╚══╝╚══╝ ╚═╝  ╚═╝╚══════╝╚═╝   ╚══════╝╚═╝  ╚═╝
 </pre>
+
+            <!-- Mobile: Split Lines -->
+            <div class="ascii-name ascii-art-split">
+                <pre class="ascii-name" style="margin:0;">
+     ██╗ █████╗ ██╗███╗   ███╗███████╗
+     ██║██╔══██╗██║████╗ ████║██╔════╝
+     ██║███████║██║██╔████╔██║█████╗  
+██   ██║██╔══██║██║██║╚██╔╝██║██╔══╝  
+╚█████╔╝██║  ██║██║██║ ╚═╝ ██║███████╗
+ ╚════╝ ╚═╝  ╚═╝╚═╝╚═╝     ╚═╝╚══════╝
+</pre>
+                <pre class="ascii-name" style="margin:0;">
+██╗    ██╗ █████╗ ██╗  ████████╗███████╗██████╗ 
+██║    ██║██╔══██╗██║  ╚══██╔══╝██╔════╝██╔══██╗
+██║ █╗ ██║███████║██║     ██║   █████╗  ██████╔╝
+██║███╗██║██╔══██║██║     ██║   ██╔══╝  ██╔══██╗
+╚███╔███╔╝██║  ██║███████╗██║   ███████╗██║  ██║
+ ╚══╝╚══╝ ╚═╝  ╚═╝╚══════╝╚═╝   ╚══════╝╚═╝  ╚═╝
+</pre>
+            </div>
         </div>
     </div>
 
