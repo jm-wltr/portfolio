@@ -19,8 +19,8 @@
         <!-- SIDEBAR: Identity & Robots -->
         <div id="sidebar" class="dash-panel">
             <div class="panel-title">USER_IDENTITY</div>
-            <div class="panel-footer-l">└</div>
-            <div class="panel-footer-r">┘</div>
+            <div class="panel-footer-l"></div>
+            <div class="panel-footer-r"></div>
 
             <pre class="art-block" style="font-size: 10px; line-height: 10px;">
    ___  ___  ______  ___  _____ 
@@ -31,13 +31,16 @@
 \____/\_| |_/\_|   \_| |_/\____/
         </pre>
 
-            <div style="margin-bottom: 1rem;">
-                <div class="accent">JAIME WALTER PÉREZ</div>
-                <div class="dim">AI Research Intern @ CSIC</div>
-                <div class="dim">Student @ UPenn</div>
+            <div style="margin-bottom: 2rem;">
+                <div class="accent" style="font-size: 1.2rem;">JAIME WALTER PÉREZ</div>
+                <div class="dim">ID: JWP-2025</div>
+                <div class="dim">LOC: UPenn / CSIC</div>
+                <br>
+                <div class="dim">> ROLE: AI Research Intern</div>
+                <div class="dim">> ROLE: Student</div>
             </div>
 
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 2rem;">
                 <a class="btn" href="https://github.com/jwalterperez">[ GITHUB ]</a>
                 <a class="btn" href="https://linkedin.com/in/jaimewalterperez">[ LINKEDIN ]</a>
                 <a class="btn" href="assets/resume.pdf">[ RESUME ]</a>
@@ -47,29 +50,29 @@
             <div id="robot-stage"></div>
         </div>
 
-        <!-- MAIN VIEW: Project List -->
+        <!-- MAIN VIEW: Project List (Middle Column) -->
         <div id="main-view" class="dash-panel" style="overflow-y: auto;">
-            <div class="panel-title">MISSION_SELECT</div>
-            <div class="panel-footer-l">└</div>
-            <div class="panel-footer-r">┘</div>
+            <div class="panel-title">MISSION_LOG</div>
+            <div class="panel-footer-l"></div>
+            <div class="panel-footer-r"></div>
             <div id="project-list">
                 <!-- Populated by JS -->
             </div>
         </div>
 
-        <!-- DETAIL VIEW: Project content -->
+        <!-- DETAIL VIEW: Project content (Right Column on Desktop, Hidden on Mobile) -->
         <div id="detail-view" class="dash-panel" style="overflow-y: auto;">
-            <div class="panel-title">DATA_LOG</div>
-            <div class="panel-footer-l">└</div>
-            <div class="panel-footer-r">┘</div>
+            <div class="panel-title">DATA_VISUALIZATION</div>
+            <div class="panel-footer-l"></div>
+            <div class="panel-footer-r"></div>
             <div id="project-details">
-                <div class="dim" style="padding: 2rem; text-align: center;">>> SELECT A MISSION TO VIEW DATA</div>
+                <div class="dim" style="padding: 2rem; text-align: center;">>> AWAITING SELECTION...</div>
             </div>
         </div>
 
         <!-- STATUS BAR -->
         <div id="status-bar">
-            <span class="dim">SYS: ONLINE</span>
+            <span class="dim">SYS: ONLINE | NET: SECURE</span>
             <span class="dim" id="clock">00:00:00</span>
         </div>
 
@@ -93,7 +96,7 @@
 
         setInterval(() => {
             const now = new Date();
-            document.getElementById('clock').innerText = now.toLocaleTimeString();
+            document.getElementById('clock').innerText = "MST: " + now.toLocaleTimeString();
         }, 1000);
 
         /**
@@ -104,7 +107,8 @@
                 id: 'sonic',
                 title: 'Sonic Tomography AI',
                 icon: '🔉',
-                desc: 'End-to-end PyTorch pipeline for sonic tomographic reconstruction.',
+                desc: 'Deep learning reconstruction.',
+                fullDesc: 'End-to-end PyTorch pipeline for sonic tomographic reconstruction.',
                 details: `
 <h3 class="accent">Sonic Tomography AI Pipeline</h3>
 <div class="dim">Type: Research | Stack: PyTorch, Python, SpecFEM2D</div>
@@ -116,10 +120,6 @@
     <li>Reduced processing time by 400% compared to traditional inversion methods.</li>
 </ul>
 <br>
-<div style="border: 1px solid var(--dim); padding: 10px; text-align: center;">
-    [ IMAGE PLACEHOLDER: Heatmap of wall density ]
-</div>
-<br>
 <a class="btn" href="#">[ VIEW PAPER ]</a> <a class="btn" href="#">[ SOURCE CODE ]</a>
         `
             },
@@ -127,12 +127,13 @@
                 id: 'social',
                 title: 'Social Media Platform',
                 icon: '☁️',
-                desc: 'Distributed microservices architecture on AWS.',
+                desc: 'Distributed AWS architecture.',
+                fullDesc: 'Instagram-like platform with microservices & distributed computing.',
                 details: `
 <h3 class="accent">Social Media Platform</h3>
 <div class="dim">Type: Full Stack | Stack: React, Node, Kafka, Spark, AWS</div>
 <br>
-<p>A scalable Instagram-like social platform built to handle high concurrency.</p>
+<p>A scalable social platform built to handle high concurrency.</p>
 <ul>
     <li>Microservices deployed on EC2 with Load Balancers.</li>
     <li>Real-time feed updates using Kafka event streaming.</li>
@@ -146,7 +147,8 @@
                 id: 'chrome',
                 title: 'Hyperlink Extractor',
                 icon: '🔗',
-                desc: 'Chrome Extension with 200+ active users.',
+                desc: 'Chrome Extension.',
+                fullDesc: 'Productivity tool optimizing workflows for research.',
                 details: `
 <h3 class="accent">Hyperlink Extractor Extension</h3>
 <div class="dim">Type: Tooling | Stack: JS, Manifest V3</div>
@@ -165,7 +167,8 @@
                 id: 'news',
                 title: 'Binary News Classifier',
                 icon: '📰',
-                desc: 'NLP model distinguishing news sources.',
+                desc: 'NLP BERT Model.',
+                fullDesc: 'NLP models to classify headlines by source.',
                 details: `
 <h3 class="accent">Binary News Classifier</h3>
 <div class="dim">Type: NLP | Stack: BERT, TensorFlow</div>
@@ -181,7 +184,8 @@
                 id: 'crash',
                 title: 'Chicago Crash Predictor',
                 icon: '🚗',
-                desc: 'XGBoost model trained on 900K accident records.',
+                desc: 'XGBoost ML.',
+                fullDesc: 'Predictive model identifying high-risk intersections in Chicago.',
                 details: `
 <h3 class="accent">Traffic Crash Predictor</h3>
 <div class="dim">Type: Data Science | Stack: Pandas, XGBoost, Sklearn</div>
@@ -200,20 +204,55 @@
          */
         const listEl = document.getElementById('project-list');
         const detailEl = document.getElementById('project-details');
+        const detailViewEl = document.getElementById('detail-view');
 
-        function renderList() {
+        function isMobile() {
+            return window.innerWidth <= 900;
+        }
+
+        function render() {
             listEl.innerHTML = '';
-            PROJECTS.forEach(p => {
-                const div = document.createElement('div');
-                div.className = 'proj-item';
-                div.innerHTML = `<span class="accent">${p.icon}</span> <b>${p.title}</b> <span class="dim">- ${p.desc}</span>`;
-                div.onclick = () => selectProject(p.id);
-                div.setAttribute('data-id', p.id);
-                listEl.appendChild(div);
-            });
+
+            if (isMobile()) {
+                // MOBILE: Render full cards inline
+                detailViewEl.style.display = 'none'; // Hide right panel
+
+                PROJECTS.forEach(p => {
+                    const div = document.createElement('div');
+                    div.className = 'proj-item mobile-card';
+                    div.innerHTML = `
+                        <div style="border-bottom: 1px dashed var(--dim); padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
+                            <span class="accent">${p.icon}</span> <b style="font-size: 1.1em">${p.title}</b>
+                        </div>
+                        <div class="dim" style="font-size: 0.9em; margin-bottom: 1rem;">${p.fullDesc}</div>
+                        ${p.details}
+                    `;
+                    listEl.appendChild(div);
+                });
+
+            } else {
+                // DESKTOP: Render clickable list + Detail View
+                detailViewEl.style.display = 'flex'; // Show right panel
+
+                PROJECTS.forEach(p => {
+                    const div = document.createElement('div');
+                    div.className = 'proj-item';
+                    div.innerHTML = `<span class="accent">${p.icon}</span> <b>${p.title}</b> <br> <span class="dim" style="font-size:0.85em">> ${p.desc}</span>`;
+                    div.onclick = () => selectProject(p.id);
+                    div.setAttribute('data-id', p.id);
+                    listEl.appendChild(div);
+                });
+
+                // Select first by default if nothing selected
+                if (!document.querySelector('.proj-item.active')) {
+                    selectProject(PROJECTS[0].id);
+                }
+            }
         }
 
         function selectProject(id) {
+            if (isMobile()) return; // No selection on mobile
+
             // Update active class
             document.querySelectorAll('.proj-item').forEach(el => {
                 if (el.getAttribute('data-id') === id) el.classList.add('active');
@@ -227,10 +266,9 @@
             }
         }
 
-        // Init
-        renderList();
-        // Select first by default
-        selectProject(PROJECTS[0].id);
+        // Init & Resize Listener
+        render();
+        window.addEventListener('resize', render);
 
         /**
          * ASCII ROBOTS ANIMATION
