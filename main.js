@@ -104,6 +104,19 @@ const screen = new AsciiScreen(plasmaContainer, {
     palette: ["#164e82", "#1f6feb", "#58a6ff", "#b6e3ff"],
     bgColor: "#000000"
 });
+
+const plasmaThemeQuery = window.matchMedia('(prefers-color-scheme: light)');
+function applyPlasmaTheme(isLight) {
+    if (isLight) {
+        screen.palette = ["#3e6aa1", "#4b7cc7", "#5b90e6", "#8cb6ff"];
+        screen.config.bgColor = "#1f2736";
+    } else {
+        screen.palette = ["#164e82", "#1f6feb", "#58a6ff", "#b6e3ff"];
+        screen.config.bgColor = "#000000";
+    }
+}
+applyPlasmaTheme(plasmaThemeQuery.matches);
+plasmaThemeQuery.addEventListener('change', (e) => applyPlasmaTheme(e.matches));
 const CHARS = " .:`',:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$";
 
 function drawPlasma(t) {
