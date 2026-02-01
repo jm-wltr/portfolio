@@ -47,7 +47,7 @@ class AsciiScreen {
         this.canvas = document.createElement('canvas');
         this.ctx = this.canvas.getContext('2d', { alpha: false });
         this.container.appendChild(this.canvas);
-        this.fontSize = 14;
+        this.fontSize = 11;
         this.fontFamily = 'Courier New, Courier, monospace';
         this.resize();
         // window resize is one trigger; reflow() after open/close is the other
