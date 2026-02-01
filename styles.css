@@ -1,0 +1,304 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #000;
+    color: #ccc;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    height: 100vh;
+    overflow: hidden;
+    user-select: none;
+}
+
+/* ─── TMUX LAYOUT ─── */
+.tmux-root {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+}
+
+.pane {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.pane-left {
+    width: 100%;
+}
+
+.pane-left.split {
+    width: 50%;
+}
+
+.pane-right {
+    width: 0%;
+    overflow: hidden;
+    border-left: 1px solid #333;
+}
+
+.pane-right.open {
+    width: 50%;
+}
+
+/* ─── PANE TITLE BAR (tmux status line style) ─── */
+.pane-bar {
+    height: 22px;
+    background: #1a1a2e;
+    border-bottom: 1px solid #333;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    gap: 16px;
+    flex-shrink: 0;
+    font-size: 12px;
+    color: #666;
+}
+
+.pane-bar .bar-title {
+    color: #58a6ff;
+    font-weight: bold;
+}
+
+.pane-bar .bar-close {
+    margin-left: auto;
+    color: #555;
+    cursor: pointer;
+    font-size: 14px;
+    transition: color 0.15s;
+}
+
+.pane-bar .bar-close:hover {
+    color: #e06c75;
+}
+
+/* ─── LEFT PANE: SCROLLABLE CONTENT ─── */
+.pane-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: none;
+}
+
+.pane-content::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+}
+
+/* ─── PLASMA HEADER (canvas layer + ASCII overlay) ─── */
+.plasma-header {
+    position: relative;
+    width: 100%;
+    height: 140px;
+    overflow: hidden;
+    border-bottom: 1px solid #333;
+    flex-shrink: 0;
+}
+
+#plasma-bg canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.header-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.ascii-name {
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: 900;
+    /* font-size set dynamically by scaleAsciiArt() */
+    line-height: 1.15;
+    white-space: pre;
+    color: #fff;
+    text-shadow:
+        3px 3px 0 #000, -1px -1px 0 #000,
+        1px -1px 0 #000, -1px 1px 0 #000,
+        1px 1px 0 #000;
+    /* prevent any overflow from ever showing */
+    max-width: 100%;
+}
+
+/* ─── TERMINAL BODY (plaintext layout) ─── */
+.term-body {
+    padding: 20px 24px;
+    color: #ccc;
+}
+
+/* prompt line */
+.prompt {
+    color: #58a6ff;
+    margin-bottom: 4px;
+}
+
+.prompt .path {
+    color: #7ec8e3;
+}
+
+.prompt .dollar {
+    color: #aaa;
+}
+
+/* section header */
+.section-label {
+    color: #444;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin: 28px 0 6px;
+    border-bottom: 1px solid #222;
+    padding-bottom: 3px;
+}
+
+.section-label:first-of-type {
+    margin-top: 18px;
+}
+
+/* nav items — the interactive links */
+.nav-item {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    padding: 5px 8px;
+    margin: 2px 0;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: background 0.12s;
+    outline: none;
+}
+
+.nav-item:hover,
+.nav-item.focused {
+    background: #1a1a2e;
+}
+
+.nav-item .nav-idx {
+    color: #3a3a5c;
+    font-size: 11px;
+    min-width: 22px;
+    text-align: right;
+}
+
+.nav-item .nav-label {
+    color: #58a6ff;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.nav-item .nav-desc {
+    color: #555;
+    font-size: 12px;
+    text-decoration: none;
+}
+
+.nav-item:hover .nav-label,
+.nav-item.focused .nav-label {
+    color: #7ec8e3;
+}
+
+/* inline text blocks */
+.info-line {
+    color: #666;
+    padding: 3px 8px;
+    font-size: 13px;
+}
+
+.info-line a {
+    color: #58a6ff;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: pointer;
+}
+
+.info-line a:hover {
+    color: #7ec8e3;
+}
+
+/* ─── RIGHT PANE: PREVIEW (iframe of raw HTML) ─── */
+.preview-frame {
+    flex: 1;
+    width: 100%;
+    border: none;
+    background: #fff;
+}
+
+/* ─── BOTTOM STATUS BAR (tmux-like) ─── */
+.tmux-status {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 18px;
+    background: #1a1a2e;
+    border-top: 1px solid #333;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    font-size: 11px;
+    color: #555;
+    gap: 20px;
+    z-index: 100;
+    flex-shrink: 0;
+}
+
+.tmux-status .status-panes {
+    color: #58a6ff;
+}
+
+.tmux-status .status-hint {
+    color: #3a3a5c;
+}
+
+/* ─── MOBILE: stack vertically ─── */
+@media (max-width: 700px) {
+    .tmux-root {
+        flex-direction: column;
+    }
+
+    .pane-left {
+        width: 100%;
+        height: 100%;
+    }
+
+    .pane-left.split {
+        width: 100%;
+        height: 50%;
+    }
+
+    .pane-right {
+        width: 100%;
+        height: 0%;
+        border-left: none;
+        border-top: 1px solid #333;
+    }
+
+    .pane-right.open {
+        width: 100%;
+        height: 50%;
+    }
+
+    .plasma-header {
+        height: 100px;
+    }
+
+    .ascii-name {
+        font-size: 7px;
+    }
+}

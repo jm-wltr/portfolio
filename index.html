@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jaime | Portfolio</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <div class="tmux-root">
+        <!-- LEFT PANE -->
+        <div class="pane pane-left" id="paneLeft">
+            <div class="pane-bar">
+                <span class="bar-title">jaime — portfolio</span>
+                <span style="color:#3a3a5c;">bash</span>
+            </div>
+            <div class="pane-content" id="leftScroll">
+                <!-- Plasma Header -->
+                <div class="plasma-header" id="plasmaHeader">
+                    <div id="plasma-bg"></div>
+                    <div class="header-overlay">
+                        <pre class="ascii-name" id="asciiArt">
+     ██╗ █████╗ ██╗███╗   ███╗███████╗      ██╗    ██╗ █████╗ ██╗  ████████╗███████╗██████╗ 
+     ██║██╔══██╗██║████╗ ████║██╔════╝      ██║    ██║██╔══██╗██║  ╚══██╔══╝██╔════╝██╔══██╗
+     ██║███████║██║██╔████╔██║█████╗        ██║ █╗ ██║███████║██║     ██║   █████╗  ██████╔╝
+██   ██║██╔══██║██║██║╚██╔╝██║██╔══╝        ██║███╗██║██╔══██║██║     ██║   ██╔══╝  ██╔══██╗
+╚█████╔╝██║  ██║██║██║ ╚═╝ ██║███████╗      ╚███╔███╔╝██║  ██║███████╗██║   ███████╗██║  ██║
+ ╚════╝ ╚═╝  ╚═╝╚═╝╚═╝     ╚═╝╚══════╝       ╚══╝╚══╝ ╚═╝  ╚═╝╚══════╝╚═╝   ╚══════╝╚═╝  ╚═╝</pre>
+                    </div>
+                </div>
+
+                <!-- Terminal body -->
+                <div class="term-body">
+                    <div class="prompt">
+                        <span class="path">~/portfolio</span> <span class="dollar">$</span> cat about.txt
+                    </div>
+                    <div class="info-line" style="margin-top:6px; color:#aaa;">
+                        Hi — I'm Jaime Walter Pérez. MSE in AI & BSE in Computer Science @ Penn.<br>
+                        Focused on Deep Learning, Systems, and building scalable full-stack applications.<br>
+                        Currently doing AI research at CSIC.
+                    </div>
+
+                    <div class="section-label">── projects ──────────────────</div>
+                    <!-- Projects list — these are the clickable items -->
+                    <div class="nav-item focused" tabindex="0" data-project="csic" data-title="csic.html">
+                        <span class="nav-idx">[1]</span>
+                        <span class="nav-label">csic</span>
+                        <span class="nav-desc">— AI Research @ CSIC (Sonic Tomography)</span>
+                    </div>
+                    <div class="nav-item" tabindex="0" data-project="social" data-title="social.html">
+                        <span class="nav-idx">[2]</span>
+                        <span class="nav-label">social</span>
+                        <span class="nav-desc">— Full-stack Social Media Platform (AWS/Kafka/Spark)</span>
+                    </div>
+                    <div class="nav-item" tabindex="0" data-project="hyperlink" data-title="hyperlink.html">
+                        <span class="nav-idx">[3]</span>
+                        <span class="nav-label">hyperlink</span>
+                        <span class="nav-desc">— Chrome Extension for Hyperlink Extraction</span>
+                    </div>
+                    <div class="nav-item" tabindex="0" data-project="news" data-title="news.html">
+                        <span class="nav-idx">[4]</span>
+                        <span class="nav-label">news</span>
+                        <span class="nav-desc">— ML News Source Classification</span>
+                    </div>
+                    <div class="nav-item" tabindex="0" data-project="prognos" data-title="prognos.html">
+                        <span class="nav-idx">[5]</span>
+                        <span class="nav-label">prognos</span>
+                        <span class="nav-desc">— AI Consulting for Prognos Health</span>
+                    </div>
+                    <div class="nav-item" tabindex="0" data-project="traffic" data-title="traffic.html">
+                        <span class="nav-idx">[6]</span>
+                        <span class="nav-label">traffic</span>
+                        <span class="nav-desc">— Chicago Traffic Crash Prediction Model</span>
+                    </div>
+                    <div class="nav-item" tabindex="0" data-project="shikaku" data-title="shikaku.html">
+                        <span class="nav-idx">[7]</span>
+                        <span class="nav-label">shikaku</span>
+                        <span class="nav-desc">— Java Swing Puzzle Game</span>
+                    </div>
+
+                    <div class="section-label">── contact ────────────────────</div>
+                    <div class="info-line">
+                        email <a href="mailto:jwalterp@seas.upenn.edu">jwalterp@seas.upenn.edu</a><br>
+                        github <a href="https://github.com/jaimewalter">github.com/jaimewalter</a><br>
+                        linkedin <a href="https://linkedin.com/in/jaimewalter">linkedin.com/in/jaimewalter</a>
+                    </div>
+
+                    <div class="section-label">── links ──────────────────────</div>
+                    <div class="nav-item" tabindex="0" data-project="resume" data-title="resume.html">
+                        <span class="nav-idx">[8]</span>
+                        <span class="nav-label">resume</span>
+                        <span class="nav-desc">— cv / work history</span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT PANE (preview) -->
+        <div class="pane pane-right" id="paneRight">
+            <div class="pane-bar">
+                <span class="bar-title" id="previewTitle">preview</span>
+                <span class="bar-close" id="closePreview">✕</span>
+            </div>
+            <iframe class="preview-frame" id="previewFrame" src="about:blank" sandbox="allow-scripts"></iframe>
+        </div>
+    </div>
+
+    <!-- BOTTOM STATUS BAR -->
+    <div class="tmux-status">
+        <span class="status-panes" id="statusPanes">[1/1]</span>
+        <span class="status-hint">↑↓ navigate · Enter open · Esc close pane</span>
+        <span style="margin-left:auto; color:#3a3a5c;">jaime@localhost ~</span>
+    </div>
+
+    <script src="projects.js"></script>
+    <script src="main.js"></script>
+</body>
+
+</html>
