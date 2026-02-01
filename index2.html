@@ -1,716 +1,861 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jaime | Portfolio</title>
-<style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jaime | Portfolio</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-body {
-    background: #000;
-    color: #ccc;
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 14px;
-    line-height: 1.5;
-    height: 100vh;
-    overflow: hidden;
-    user-select: none;
-}
+        body {
+            background: #000;
+            color: #ccc;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            height: 100vh;
+            overflow: hidden;
+            user-select: none;
+        }
 
-/* ─── TMUX LAYOUT ─── */
-.tmux-root {
-    display: flex;
-    width: 100vw;
-    height: 100vh;
-}
+        /* ─── TMUX LAYOUT ─── */
+        .tmux-root {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+        }
 
-.pane {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
+        .pane {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
 
-.pane-left { width: 100%; }
-.pane-left.split { width: 50%; }
+        .pane-left {
+            width: 100%;
+        }
 
-.pane-right {
-    width: 0%;
-    overflow: hidden;
-    border-left: 1px solid #333;
-}
-.pane-right.open { width: 50%; }
+        .pane-left.split {
+            width: 50%;
+        }
 
-/* ─── PANE TITLE BAR (tmux status line style) ─── */
-.pane-bar {
-    height: 22px;
-    background: #1a1a2e;
-    border-bottom: 1px solid #333;
-    display: flex;
-    align-items: center;
-    padding: 0 10px;
-    gap: 16px;
-    flex-shrink: 0;
-    font-size: 12px;
-    color: #666;
-}
-.pane-bar .bar-title {
-    color: #58a6ff;
-    font-weight: bold;
-}
-.pane-bar .bar-close {
-    margin-left: auto;
-    color: #555;
-    cursor: pointer;
-    font-size: 14px;
-    transition: color 0.15s;
-}
-.pane-bar .bar-close:hover { color: #e06c75; }
+        .pane-right {
+            width: 0%;
+            overflow: hidden;
+            border-left: 1px solid #333;
+        }
 
-/* ─── LEFT PANE: SCROLLABLE CONTENT ─── */
-.pane-content {
-    flex: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
-    scrollbar-width: thin;
-    scrollbar-color: #333 transparent;
-}
-.pane-content::-webkit-scrollbar { width: 6px; }
-.pane-content::-webkit-scrollbar-track { background: transparent; }
-.pane-content::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+        .pane-right.open {
+            width: 50%;
+        }
 
-/* ─── PLASMA HEADER (canvas layer + ASCII overlay) ─── */
-.plasma-header {
-    position: relative;
-    width: 100%;
-    height: 140px;
-    overflow: hidden;
-    border-bottom: 1px solid #333;
-    flex-shrink: 0;
-}
-#plasma-bg canvas {
-    display: block;
-    width: 100%;
-    height: 100%;
-}
-.header-overlay {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-    z-index: 10;
-}
-.ascii-name {
-    font-family: 'Courier New', Courier, monospace;
-    font-weight: 900;
-    /* font-size set dynamically by scaleAsciiArt() */
-    line-height: 1.15;
-    white-space: pre;
-    color: #fff;
-    text-shadow:
-        3px 3px 0 #000, -1px -1px 0 #000,
-        1px -1px 0 #000, -1px 1px 0 #000,
-        1px 1px 0 #000;
-    /* prevent any overflow from ever showing */
-    max-width: 100%;
-}
+        /* ─── PANE TITLE BAR (tmux status line style) ─── */
+        .pane-bar {
+            height: 22px;
+            background: #1a1a2e;
+            border-bottom: 1px solid #333;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            gap: 16px;
+            flex-shrink: 0;
+            font-size: 12px;
+            color: #666;
+        }
 
-/* ─── TERMINAL BODY (plaintext layout) ─── */
-.term-body {
-    padding: 20px 24px;
-    color: #ccc;
-}
+        .pane-bar .bar-title {
+            color: #58a6ff;
+            font-weight: bold;
+        }
 
-/* prompt line */
-.prompt {
-    color: #58a6ff;
-    margin-bottom: 4px;
-}
-.prompt .path { color: #7ec8e3; }
-.prompt .dollar { color: #aaa; }
+        .pane-bar .bar-close {
+            margin-left: auto;
+            color: #555;
+            cursor: pointer;
+            font-size: 14px;
+            transition: color 0.15s;
+        }
 
-/* section header */
-.section-label {
-    color: #444;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin: 28px 0 6px;
-    border-bottom: 1px solid #222;
-    padding-bottom: 3px;
-}
-.section-label:first-of-type { margin-top: 18px; }
+        .pane-bar .bar-close:hover {
+            color: #e06c75;
+        }
 
-/* nav items — the interactive links */
-.nav-item {
-    display: flex;
-    align-items: baseline;
-    gap: 12px;
-    padding: 5px 8px;
-    margin: 2px 0;
-    cursor: pointer;
-    border-radius: 2px;
-    transition: background 0.12s;
-    outline: none;
-}
-.nav-item:hover, .nav-item.focused {
-    background: #1a1a2e;
-}
-.nav-item .nav-idx {
-    color: #3a3a5c;
-    font-size: 11px;
-    min-width: 22px;
-    text-align: right;
-}
-.nav-item .nav-label {
-    color: #58a6ff;
-    text-decoration: underline;
-    text-underline-offset: 3px;
-}
-.nav-item .nav-desc {
-    color: #555;
-    font-size: 12px;
-    text-decoration: none;
-}
-.nav-item:hover .nav-label,
-.nav-item.focused .nav-label { color: #7ec8e3; }
+        /* ─── LEFT PANE: SCROLLABLE CONTENT ─── */
+        .pane-content {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: thin;
+            scrollbar-color: #333 transparent;
+        }
 
-/* inline text blocks */
-.info-line {
-    color: #666;
-    padding: 3px 8px;
-    font-size: 13px;
-}
-.info-line a {
-    color: #58a6ff;
-    text-decoration: underline;
-    text-underline-offset: 2px;
-    cursor: pointer;
-}
-.info-line a:hover { color: #7ec8e3; }
+        .pane-content::-webkit-scrollbar {
+            width: 6px;
+        }
 
-/* cursor blink for the prompt at bottom */
-@keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
-}
-.cursor {
-    display: inline-block;
-    width: 8px; height: 14px;
-    background: #58a6ff;
-    animation: blink 1.1s step-end infinite;
-    vertical-align: text-bottom;
-    margin-left: 2px;
-}
+        .pane-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
 
-/* ─── RIGHT PANE: PREVIEW (iframe of raw HTML) ─── */
-.preview-frame {
-    flex: 1;
-    width: 100%;
-    border: none;
-    background: #fff;
-}
+        .pane-content::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 3px;
+        }
 
-/* ─── BOTTOM STATUS BAR (tmux-like) ─── */
-.tmux-status {
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    height: 18px;
-    background: #1a1a2e;
-    border-top: 1px solid #333;
-    display: flex;
-    align-items: center;
-    padding: 0 10px;
-    font-size: 11px;
-    color: #555;
-    gap: 20px;
-    z-index: 100;
-    flex-shrink: 0;
-}
-.tmux-status .status-panes { color: #58a6ff; }
-.tmux-status .status-hint { color: #3a3a5c; }
+        /* ─── PLASMA HEADER (canvas layer + ASCII overlay) ─── */
+        .plasma-header {
+            position: relative;
+            width: 100%;
+            height: 140px;
+            overflow: hidden;
+            border-bottom: 1px solid #333;
+            flex-shrink: 0;
+        }
 
-/* ─── MOBILE: stack vertically ─── */
-@media (max-width: 700px) {
-    .tmux-root { flex-direction: column; }
-    .pane-left { width: 100%; height: 100%; }
-    .pane-left.split { width: 100%; height: 50%; }
-    .pane-right { width: 100%; height: 0%; border-left: none; border-top: 1px solid #333; }
-    .pane-right.open { width: 100%; height: 50%; }
-    .plasma-header { height: 100px; }
-    .ascii-name { font-size: 7px; }
-}
-</style>
+        #plasma-bg canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .header-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .ascii-name {
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: 900;
+            /* font-size set dynamically by scaleAsciiArt() */
+            line-height: 1.15;
+            white-space: pre;
+            color: #fff;
+            text-shadow:
+                3px 3px 0 #000, -1px -1px 0 #000,
+                1px -1px 0 #000, -1px 1px 0 #000,
+                1px 1px 0 #000;
+            /* prevent any overflow from ever showing */
+            max-width: 100%;
+        }
+
+        /* ─── TERMINAL BODY (plaintext layout) ─── */
+        .term-body {
+            padding: 20px 24px;
+            color: #ccc;
+        }
+
+        /* prompt line */
+        .prompt {
+            color: #58a6ff;
+            margin-bottom: 4px;
+        }
+
+        .prompt .path {
+            color: #7ec8e3;
+        }
+
+        .prompt .dollar {
+            color: #aaa;
+        }
+
+        /* section header */
+        .section-label {
+            color: #444;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 28px 0 6px;
+            border-bottom: 1px solid #222;
+            padding-bottom: 3px;
+        }
+
+        .section-label:first-of-type {
+            margin-top: 18px;
+        }
+
+        /* nav items — the interactive links */
+        .nav-item {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            padding: 5px 8px;
+            margin: 2px 0;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: background 0.12s;
+            outline: none;
+        }
+
+        .nav-item:hover,
+        .nav-item.focused {
+            background: #1a1a2e;
+        }
+
+        .nav-item .nav-idx {
+            color: #3a3a5c;
+            font-size: 11px;
+            min-width: 22px;
+            text-align: right;
+        }
+
+        .nav-item .nav-label {
+            color: #58a6ff;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        .nav-item .nav-desc {
+            color: #555;
+            font-size: 12px;
+            text-decoration: none;
+        }
+
+        .nav-item:hover .nav-label,
+        .nav-item.focused .nav-label {
+            color: #7ec8e3;
+        }
+
+        /* inline text blocks */
+        .info-line {
+            color: #666;
+            padding: 3px 8px;
+            font-size: 13px;
+        }
+
+        .info-line a {
+            color: #58a6ff;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+            cursor: pointer;
+        }
+
+        .info-line a:hover {
+            color: #7ec8e3;
+        }
+
+        /* cursor blink for the prompt at bottom */
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 14px;
+            background: #58a6ff;
+            animation: blink 1.1s step-end infinite;
+            vertical-align: text-bottom;
+            margin-left: 2px;
+        }
+
+        /* ─── RIGHT PANE: PREVIEW (iframe of raw HTML) ─── */
+        .preview-frame {
+            flex: 1;
+            width: 100%;
+            border: none;
+            background: #fff;
+        }
+
+        /* ─── BOTTOM STATUS BAR (tmux-like) ─── */
+        .tmux-status {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 18px;
+            background: #1a1a2e;
+            border-top: 1px solid #333;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            font-size: 11px;
+            color: #555;
+            gap: 20px;
+            z-index: 100;
+            flex-shrink: 0;
+        }
+
+        .tmux-status .status-panes {
+            color: #58a6ff;
+        }
+
+        .tmux-status .status-hint {
+            color: #3a3a5c;
+        }
+
+        /* ─── MOBILE: stack vertically ─── */
+        @media (max-width: 700px) {
+            .tmux-root {
+                flex-direction: column;
+            }
+
+            .pane-left {
+                width: 100%;
+                height: 100%;
+            }
+
+            .pane-left.split {
+                width: 100%;
+                height: 50%;
+            }
+
+            .pane-right {
+                width: 100%;
+                height: 0%;
+                border-left: none;
+                border-top: 1px solid #333;
+            }
+
+            .pane-right.open {
+                width: 100%;
+                height: 50%;
+            }
+
+            .plasma-header {
+                height: 100px;
+            }
+
+            .ascii-name {
+                font-size: 7px;
+            }
+        }
+    </style>
 </head>
+
 <body>
 
-<div class="tmux-root">
-    <!-- LEFT PANE -->
-    <div class="pane pane-left" id="paneLeft">
-        <div class="pane-bar">
-            <span class="bar-title">jaime — portfolio</span>
-            <span style="color:#3a3a5c;">bash</span>
-        </div>
-        <div class="pane-content" id="leftScroll">
-            <!-- Plasma Header -->
-            <div class="plasma-header" id="plasmaHeader">
-                <div id="plasma-bg"></div>
-                <div class="header-overlay">
-                    <pre class="ascii-name" id="asciiArt">
+    <div class="tmux-root">
+        <!-- LEFT PANE -->
+        <div class="pane pane-left" id="paneLeft">
+            <div class="pane-bar">
+                <span class="bar-title">jaime — portfolio</span>
+                <span style="color:#3a3a5c;">bash</span>
+            </div>
+            <div class="pane-content" id="leftScroll">
+                <!-- Plasma Header -->
+                <div class="plasma-header" id="plasmaHeader">
+                    <div id="plasma-bg"></div>
+                    <div class="header-overlay">
+                        <pre class="ascii-name" id="asciiArt">
      ██╗ █████╗ ██╗███╗   ███╗███████╗      ██╗    ██╗ █████╗ ██╗  ████████╗███████╗██████╗ 
      ██║██╔══██╗██║████╗ ████║██╔════╝      ██║    ██║██╔══██╗██║  ╚══██╔══╝██╔════╝██╔══██╗
      ██║███████║██║██╔████╔██║█████╗        ██║ █╗ ██║███████║██║     ██║   █████╗  ██████╔╝
 ██   ██║██╔══██║██║██║╚██╔╝██║██╔══╝        ██║███╗██║██╔══██║██║     ██║   ██╔══╝  ██╔══██╗
 ╚█████╔╝██║  ██║██║██║ ╚═╝ ██║███████╗      ╚███╔███╔╝██║  ██║███████╗██║   ███████╗██║  ██║
  ╚════╝ ╚═╝  ╚═╝╚═╝╚═╝     ╚═╝╚══════╝       ╚══╝╚══╝ ╚═╝  ╚═╝╚══════╝╚═╝   ╚══════╝╚═╝  ╚═╝</pre>
-                </div>
-            </div>
-
-            <!-- Terminal body -->
-            <div class="term-body">
-                <div class="prompt">
-                    <span class="path">~/portfolio</span> <span class="dollar">$</span> cat about.txt
-                </div>
-                <div class="info-line" style="margin-top:6px; color:#aaa;">
-                    Hi — I'm Jaime Walter. Software developer based in [city].<br>
-                    I build things that live on the internet. Sometimes they're useful.<br>
-                    Sometimes they're just interesting.
+                    </div>
                 </div>
 
-                <div class="section-label">── projects ──────────────────</div>
-                <!-- Projects list — these are the clickable items -->
-                <div class="nav-item focused" tabindex="0" data-project="giggle" data-title="giggle.html">
-                    <span class="nav-idx">[1]</span>
-                    <span class="nav-label">giggle</span>
-                    <span class="nav-desc">— a real-time collaborative laughing machine</span>
-                </div>
-                <div class="nav-item" tabindex="0" data-project="mosaic" data-title="mosaic.html">
-                    <span class="nav-idx">[2]</span>
-                    <span class="nav-label">mosaic</span>
-                    <span class="nav-desc">— generative tile art from audio input</span>
-                </div>
-                <div class="nav-item" tabindex="0" data-project="drift" data-title="drift.html">
-                    <span class="nav-idx">[3]</span>
-                    <span class="nav-label">drift</span>
-                    <span class="nav-desc">— a particle simulation sandbox</span>
-                </div>
-                <div class="nav-item" tabindex="0" data-project="mirror" data-title="mirror.html">
-                    <span class="nav-idx">[4]</span>
-                    <span class="nav-label">mirror</span>
-                    <span class="nav-desc">— webcam + shader self-portrait</span>
-                </div>
+                <!-- Terminal body -->
+                <div class="term-body">
+                    <div class="prompt">
+                        <span class="path">~/portfolio</span> <span class="dollar">$</span> cat about.txt
+                    </div>
+                    <div class="info-line" style="margin-top:6px; color:#aaa;">
+                        Hi — I'm Jaime Walter Pérez. MSE in AI & BSE in Computer Science @ Penn.<br>
+                        Focused on Deep Learning, Systems, and building scalable full-stack applications.<br>
+                        Currently doing AI research at CSIC.
+                    </div>
 
-                <div class="section-label">── contact ────────────────────</div>
-                <div class="info-line">
-                    email   <a href="mailto:jaime@example.com">jaime@example.com</a><br>
-                    github  <a href="#">github.com/jaime</a><br>
-                    twitter <a href="#">@jaimewltr</a>
-                </div>
+                    <div class="section-label">── projects ──────────────────</div>
+                    <!-- Projects list — these are the clickable items -->
+                    <div class="nav-item focused" tabindex="0" data-project="csic" data-title="csic.html">
+                        <span class="nav-idx">[1]</span>
+                        <span class="nav-label">csic</span>
+                        <span class="nav-desc">— AI Research @ CSIC (Sonic Tomography)</span>
+                    </div>
+                    <div class="nav-item" tabindex="0" data-project="social" data-title="social.html">
+                        <span class="nav-idx">[2]</span>
+                        <span class="nav-label">social</span>
+                        <span class="nav-desc">— Full-stack Social Media Platform (AWS/Kafka/Spark)</span>
+                    </div>
+                    <div class="nav-item" tabindex="0" data-project="hyperlink" data-title="hyperlink.html">
+                        <span class="nav-idx">[3]</span>
+                        <span class="nav-label">hyperlink</span>
+                        <span class="nav-desc">— Chrome Extension for Hyperlink Extraction</span>
+                    </div>
+                    <div class="nav-item" tabindex="0" data-project="news" data-title="news.html">
+                        <span class="nav-idx">[4]</span>
+                        <span class="nav-label">news</span>
+                        <span class="nav-desc">— ML News Source Classification</span>
+                    </div>
+                    <div class="nav-item" tabindex="0" data-project="prognos" data-title="prognos.html">
+                        <span class="nav-idx">[5]</span>
+                        <span class="nav-label">prognos</span>
+                        <span class="nav-desc">— AI Consulting for Prognos Health</span>
+                    </div>
+                    <div class="nav-item" tabindex="0" data-project="traffic" data-title="traffic.html">
+                        <span class="nav-idx">[6]</span>
+                        <span class="nav-label">traffic</span>
+                        <span class="nav-desc">— Chicago Traffic Crash Prediction Model</span>
+                    </div>
+                    <div class="nav-item" tabindex="0" data-project="shikaku" data-title="shikaku.html">
+                        <span class="nav-idx">[7]</span>
+                        <span class="nav-label">shikaku</span>
+                        <span class="nav-desc">— Java Swing Puzzle Game</span>
+                    </div>
 
-                <div class="section-label">── links ──────────────────────</div>
-                <div class="nav-item" tabindex="0" data-project="resume" data-title="resume.html">
-                    <span class="nav-idx">[5]</span>
-                    <span class="nav-label">resume</span>
-                    <span class="nav-desc">— cv / work history</span>
-                </div>
+                    <div class="section-label">── contact ────────────────────</div>
+                    <div class="info-line">
+                        email <a href="mailto:jwalterp@seas.upenn.edu">jwalterp@seas.upenn.edu</a><br>
+                        github <a href="https://github.com/jaimewalter">github.com/jaimewalter</a><br>
+                        linkedin <a href="https://linkedin.com/in/jaimewalter">linkedin.com/in/jaimewalter</a>
+                    </div>
 
-                <!-- bottom prompt with blinking cursor -->
-                <div class="prompt" style="margin-top:32px;">
-                    <span class="path">~/portfolio</span> <span class="dollar">$</span> <span class="cursor"></span>
+                    <div class="section-label">── links ──────────────────────</div>
+                    <div class="nav-item" tabindex="0" data-project="resume" data-title="resume.html">
+                        <span class="nav-idx">[8]</span>
+                        <span class="nav-label">resume</span>
+                        <span class="nav-desc">— cv / work history</span>
+                    </div>
+
+                    <!-- bottom prompt with blinking cursor -->
+                    <div class="prompt" style="margin-top:32px;">
+                        <span class="path">~/portfolio</span> <span class="dollar">$</span> <span class="cursor"></span>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- RIGHT PANE (preview) -->
-    <div class="pane pane-right" id="paneRight">
-        <div class="pane-bar">
-            <span class="bar-title" id="previewTitle">preview</span>
-            <span class="bar-close" id="closePreview">✕</span>
+        <!-- RIGHT PANE (preview) -->
+        <div class="pane pane-right" id="paneRight">
+            <div class="pane-bar">
+                <span class="bar-title" id="previewTitle">preview</span>
+                <span class="bar-close" id="closePreview">✕</span>
+            </div>
+            <iframe class="preview-frame" id="previewFrame" src="about:blank" sandbox="allow-scripts"></iframe>
         </div>
-        <iframe class="preview-frame" id="previewFrame" src="about:blank" sandbox="allow-scripts"></iframe>
     </div>
-</div>
 
-<!-- BOTTOM STATUS BAR -->
-<div class="tmux-status">
-    <span class="status-panes" id="statusPanes">[1/1]</span>
-    <span class="status-hint">↑↓ navigate · Enter open · Esc close pane</span>
-    <span style="margin-left:auto; color:#3a3a5c;">jaime@localhost ~</span>
-</div>
+    <!-- BOTTOM STATUS BAR -->
+    <div class="tmux-status">
+        <span class="status-panes" id="statusPanes">[1/1]</span>
+        <span class="status-hint">↑↓ navigate · Enter open · Esc close pane</span>
+        <span style="margin-left:auto; color:#3a3a5c;">jaime@localhost ~</span>
+    </div>
 
-<script>
-// ─────────────────────────────────────────────
-// PROJECT PAGE CONTENT (raw HTML, no CSS)
-// Each value is a full HTML doc that renders with browser defaults only.
-// ─────────────────────────────────────────────
-const PROJECTS = {
-    giggle: `<!DOCTYPE html><html><head><title>giggle</title></head><body>
-<h1>giggle</h1>
+    <script>
+        // ─────────────────────────────────────────────
+        // PROJECT PAGE CONTENT (raw HTML, no CSS)
+        // Each value is a full HTML doc that renders with browser defaults only.
+        // ─────────────────────────────────────────────
+        const PROJECTS = {
+            csic: `<!DOCTYPE html><html><head><title>CSIC Research</title></head><body>
+<h1>AI Research Intern @ CSIC</h1>
 <hr>
-<p><strong>A real-time collaborative laughing machine.</strong></p>
-<p>Built with WebSockets and the Web Audio API. Multiple users connect to a shared room and trigger laugh samples that layer and pitch-shift based on how many people are laughing at once.</p>
-<h2>How it works</h2>
-<ol>
-<li>You open a room (or join one via a link).</li>
-<li>Press the big button. Your laugh sample fires.</li>
-<li>The server broadcasts the event. Everyone hears it.</li>
-<li>If 4+ people laugh within 2 seconds, the "cascade" effect kicks in — pitch rises, tempo accelerates, chaos ensues.</li>
-</ol>
-<h2>Tech stack</h2>
+<p><strong>ITEFI, Spanish National Research Council | 2025 - Present</strong></p>
+<p>Independently implemented a PyTorch deep-learning pipeline for sonic tomographic reconstruction of historic masonry walls. Research conducted under Dr. Javier Ortega Heras in the G-CARMA group.</p>
+<h2>Key Contributions</h2>
 <ul>
-<li>Node.js + Socket.io (server)</li>
-<li>Web Audio API (client-side mixing)</li>
-<li>Tone.js for the pitch-shifting engine</li>
-<li>Canvas for the visual "laugh meter"</li>
+<li>Automated wall geometry generation (Python) and acoustic wave simulations (COMSOL + Java).</li>
+<li>Scaled simulation throughput from a few runs/day to ~200.</li>
+<li>Achieved ~93% validation accuracy on simulation data, enabling experiments with real walls.</li>
 </ul>
-<h2>What I learned</h2>
-<p>Synchronizing audio across networked clients is harder than it sounds. Latency compensation was the main challenge — I ended up using a shared clock offset negotiation on connect, similar to NTP but stripped down.</p>
-<p><a href="#">→ View source on GitHub</a></p>
-<p><a href="#">→ Play it live</a></p>
+<h2>Tech Stack</h2>
+<ul>
+<li>Python, PyTorch</li>
+<li>COMSOL, Java</li>
+<li>Sonic Tomography, Deep Learning</li>
+</ul>
 </body></html>`,
 
-    mosaic: `<!DOCTYPE html><html><head><title>mosaic</title></head><body>
-<h1>mosaic</h1>
+            social: `<!DOCTYPE html><html><head><title>Social Media Platform</title></head><body>
+<h1>Full-stack Social Media Platform</h1>
 <hr>
-<p><strong>Generative tile art from audio input.</strong></p>
-<p>Feed it a microphone or an audio file. Watch it draw.</p>
-<h2>The idea</h2>
-<p>Each frequency band in the audio spectrum maps to a tile shape and color. Bass = large warm rectangles. Treble = tiny cool dots. Mid-range fills in the gaps with gradients. The result is an evolving mosaic that's unique to whatever you're playing.</p>
-<h2>Controls</h2>
-<ul>
-<li><strong>Mic</strong> — use your computer's microphone</li>
-<li><strong>File</strong> — drop an MP3 or WAV onto the canvas</li>
-<li><strong>Palette</strong> — cycle through 6 color themes</li>
-<li><strong>Speed</strong> — adjust how fast tiles are placed</li>
-</ul>
-<h2>Tech stack</h2>
-<ul>
-<li>Web Audio API (FFT analysis)</li>
-<li>Canvas 2D (tile rendering)</li>
-<li>Pure vanilla JS — zero dependencies</li>
-</ul>
-<h2>Source</h2>
-<p><a href="#">→ GitHub</a></p>
-<p><a href="#">→ Live demo</a></p>
-</body></html>`,
-
-    drift: `<!DOCTYPE html><html><head><title>drift</title></head><body>
-<h1>drift</h1>
-<hr>
-<p><strong>A particle simulation sandbox.</strong></p>
-<p>Tens of thousands of particles, governed by configurable force fields. Drag to push. Click to explode. Watch them settle.</p>
+<p><strong>Instagram-like platform with high-scale architecture.</strong></p>
+<p>Built in a four-person team, this platform handles post streaming, face-matching, and recommendation algorithms.</p>
 <h2>Features</h2>
 <ul>
-<li>Up to 50,000 particles (GPU-accelerated via WebGL)</li>
-<li>Attraction, repulsion, and gravity fields</li>
-<li>Mouse interaction — push, pull, or detonate</li>
-<li>Color modes: velocity, density, age</li>
-<li>Exportable as PNG snapshots</li>
+<li>Reactive Frontend with React and Node.js/Express backend.</li>
+<li>Scalable infrastructure on AWS (EC2, RDS, S3).</li>
+<li>Real-time data processing with Apache Kafka and Spark.</li>
+<li>Advanced search/matching using ChromaDB for face-matching.</li>
 </ul>
-<h2>Architecture</h2>
-<p>Particles live on the GPU as texture data. Each frame, a compute shader updates positions based on sampled force fields. A second shader renders them as points with color lookups. The CPU only handles input and orchestration.</p>
-<h2>Tech stack</h2>
+<h2>Tech Stack</h2>
 <ul>
-<li>WebGL 2 (compute via ping-pong framebuffers)</li>
-<li>GLSL shaders</li>
-<li>Canvas 2D fallback for older browsers</li>
+<li>React, Node.js, Express</li>
+<li>AWS (EC2, RDS, S3)</li>
+<li>Apache Kafka, Apache Spark</li>
+<li>ChromaDB, MySQL</li>
 </ul>
-<p><a href="#">→ GitHub</a></p>
-<p><a href="#">→ Live demo</a></p>
 </body></html>`,
 
-    mirror: `<!DOCTYPE html><html><head><title>mirror</title></head><body>
-<h1>mirror</h1>
+            hyperlink: `<!DOCTYPE html><html><head><title>Hyperlink Extractor</title></head><body>
+<h1>Hyperlink Extractor</h1>
 <hr>
-<p><strong>Webcam + shader self-portrait.</strong></p>
-<p>Point your camera at yourself. Watch the image dissolve, reassemble, glitch, and reform through a chain of post-processing shaders.</p>
-<h2>Effects chain</h2>
-<ol>
-<li><strong>Edge detect</strong> — Sobel filter extracts outlines</li>
-<li><strong>Threshold</strong> — converts to stark black/white</li>
-<li><strong>Displacement</strong> — a noise-based warp distorts the edges</li>
-<li><strong>Color shift</strong> — RGB channels are offset by sine waves over time</li>
-<li><strong>Feedback loop</strong> — previous frame is blended back in, creating trails</li>
-</ol>
-<h2>Controls</h2>
+<p><strong>MV3 Chrome Extension for efficient link management.</strong></p>
+<p>Developed tool to copy text with hyperlinks to clipboard with the option to automatically add a ChatGPT prompt.</p>
+<h2>Functionality</h2>
 <ul>
-<li>Sliders for each effect's intensity</li>
-<li>Preset buttons: "ghost", "neon", "dissolve", "glitch"</li>
-<li>Snapshot button to save current frame</li>
+<li>Interactive sidebar with settings and extraction history.</li>
+<li>Seamless integration with clipboard and ChatGPT prompts.</li>
+<li>Built using Manifest V3 standards.</li>
 </ul>
-<h2>Tech stack</h2>
+<h2>Tech Stack</h2>
 <ul>
-<li>WebGL 2 + GLSL fragment shaders</li>
-<li>getUserMedia (webcam access)</li>
-<li>OffscreenCanvas for framebuffer management</li>
+<li>JavaScript (Chrome Extension API)</li>
+<li>HTML/CSS (Sidebar UI)</li>
+<li>Manifest V3</li>
 </ul>
-<p><a href="#">→ GitHub</a></p>
 </body></html>`,
 
-    resume: `<!DOCTYPE html><html><head><title>resume</title></head><body>
-<h1>Jaime Walter</h1>
-<p>Software Developer</p>
+            news: `<!DOCTYPE html><html><head><title>News Classification</title></head><body>
+<h1>ML News Source Classification</h1>
 <hr>
+<p><strong>Binary classification of newspaper headlines.</strong></p>
+<p>Trained different NLP machine learning models to determine the source of a newspaper headline.</p>
+<h2>Performance</h2>
+<ul>
+<li>Achieved 87% accuracy using a fine-tuned BERT model.</li>
+<li>Explored various NLP architectures and tokenization strategies.</li>
+<li>Focused on high-performance inference and fine-tuning.</li>
+</ul>
+<h2>Tech Stack</h2>
+<ul>
+<li>Python, PyTorch/TensorFlow</li>
+<li>Hugging Face (BERT)</li>
+<li>Scikit-learn</li>
+</ul>
+</body></html>`,
+
+            prognos: `<!DOCTYPE html><html><head><title>Prognos AI Consulting</title></head><body>
+<h1>AI Consulting for Prognos Health</h1>
+<hr>
+<p><strong>NLP tool for sales strategy analysis.</strong></p>
+<p>Developing an NLP tool to analyze sales strategies and generate data-driven insights.</p>
+<h2>Impact</h2>
+<ul>
+<li>Enhancing sales pitches and decision-making for conversion rate improvement.</li>
+<li>Analyzing large datasets of sales interactions.</li>
+</ul>
+<h2>Tech Stack</h2>
+<ul>
+<li>Python, NLP</li>
+<li>LLMs, Data-driven analytics</li>
+</ul>
+</body></html>`,
+
+            traffic: `<!DOCTYPE html><html><head><title>Traffic Crash Prediction</title></head><body>
+<h1>ML Model for Traffic Crashes</h1>
+<hr>
+<p><strong>Predicting high-risk areas in Chicago.</strong></p>
+<p>Trained and tuned ML models with 900,000 traffic accidents in Chicago to predict high-risk areas.</p>
+<h2>Insights</h2>
+<ul>
+<li>Correlated weather, time of day, and location for risk assessment.</li>
+<li>Evaluated using Logistic Regression, Random Forest, and XGBoost.</li>
+<li>Extensive data preprocessing and feature engineering.</li>
+</ul>
+<h2>Tech Stack</h2>
+<ul>
+<li>Python, Scikit-learn, XGBoost</li>
+<li>Pandas, NumPy</li>
+<li>Data Visualization</li>
+</ul>
+</body></html>`,
+
+            shikaku: `<!DOCTYPE html><html><head><title>Shikaku Game</title></head><body>
+<h1>Shikaku Game</h1>
+<hr>
+<p><strong>Java-based puzzle game.</strong></p>
+<p>Created a game with Java Swing featuring an efficient recursive algorithm for puzzle generation.</p>
+<h2>Features</h2>
+<ul>
+<li>Interactive GUI with Java Swing.</li>
+<li>Efficient recursive generation algorithm.</li>
+<li>Packaged with an installer for Windows and macOS.</li>
+</ul>
+<h2>Tech Stack</h2>
+<ul>
+<li>Java, Swing</li>
+<li>Algorithms (Recursion)</li>
+</ul>
+</body></html>`,
+
+            resume: `<!DOCTYPE html><html><head><title>Resume - Jaime Walter Pérez</title></head><body>
+<h1>Jaime Walter Pérez</h1>
+<p>jwalterp@seas.upenn.edu | +34 601 179 344 | +1 (445) 260 6738</p>
+<hr>
+<h2>Education</h2>
+<p><strong>University of Pennsylvania</strong> | 2023 - 2027<br>
+MSE in Computer and Information Science, AI (Submatriculation)<br>
+BSE in Computer Science, Systems</p>
+<p><strong>Altillo International School</strong> | 2019 - 2023<br>
+Dual Diploma: Spanish High School + International Baccalaureate (IB)</p>
+
 <h2>Experience</h2>
-<p><strong>Senior Developer</strong> — Acme Studio (2022 – present)<br>
-Led a 3-person team building internal tooling. Shipped a real-time data dashboard serving 200+ users. Reduced build times by 60% by migrating to Vite + esbuild.</p>
-<p><strong>Developer</strong> — Freelance (2019 – 2022)<br>
-Web apps, creative coding projects, a handful of browser extensions. Clients in music, art, and fintech.</p>
-<p><strong>Intern</strong> — StartupXYZ (2018)<br>
-Built out the onboarding flow. Wrote a lot of CSS. Learned a lot about shipping fast.</p>
+<p><strong>AI Research Intern</strong> — ITEFI, CSIC (2025 – Present)<br>
+Sonic tomographic reconstruction using PyTorch.</p>
+<p><strong>CIS 2620 Teaching Assistant</strong> — Penn (2025 – Present)<br>
+Automata, Computability and Complexity.</p>
+<p><strong>Makerspace Coordinator</strong> — Penn Architechs (2024 – Present)<br>
+Overseeing lab and engineering projects.</p>
+
 <h2>Skills</h2>
 <ul>
-<li>JavaScript / TypeScript</li>
-<li>React, Svelte, Node.js</li>
-<li>WebGL, Web Audio API, Canvas</li>
-<li>Rust (hobby/learning)</li>
-<li>Git, Docker, CI/CD</li>
+<li>Python, Java, JS, Machine Learning (PyTorch, TensorFlow, scikit-learn)</li>
+<li>AWS, Spark, Kafka, SQL, ChromaDB, Docker, CI/CD</li>
+<li>Languages: Spanish (Native), English (C2), French (B2)</li>
 </ul>
-<h2>Education</h2>
-<p><strong>B.S. Computer Science</strong> — University of [X], 2018</p>
-<h2>Contact</h2>
-<p>jaime@example.com · github.com/jaime</p>
 </body></html>`
-};
+        };
 
-// ─────────────────────────────────────────────
-// ASCII ART SCALING
-// Measures the art's intrinsic width at a known reference size,
-// then scales down (never up past that reference) to fit the header.
-// Called on window resize AND after every pane open/close.
-// ─────────────────────────────────────────────
-const asciiEl = document.getElementById('asciiArt');
-const headerOverlay = document.querySelector('.header-overlay');
+        // ─────────────────────────────────────────────
+        // ASCII ART SCALING
+        // Measures the art's intrinsic width at a known reference size,
+        // then scales down (never up past that reference) to fit the header.
+        // Called on window resize AND after every pane open/close.
+        // ─────────────────────────────────────────────
+        const asciiEl = document.getElementById('asciiArt');
+        const headerOverlay = document.querySelector('.header-overlay');
 
-// We measure once at a large reference size to know the "native" pixel width.
-const REF_FONT_SIZE = 13; // px — max size the art will ever render at
-let asciiNativeWidth = 0;
+        // We measure once at a large reference size to know the "native" pixel width.
+        const REF_FONT_SIZE = 13; // px — max size the art will ever render at
+        let asciiNativeWidth = 0;
 
-function measureAsciiNativeWidth() {
-    // Temporarily set a known size, measure, then restore
-    asciiEl.style.fontSize = REF_FONT_SIZE + 'px';
-    asciiNativeWidth = asciiEl.scrollWidth;
-    asciiEl.style.fontSize = ''; // clear so we can set the real value next
-}
+        function measureAsciiNativeWidth() {
+            // Temporarily set a known size, measure, then restore
+            asciiEl.style.fontSize = REF_FONT_SIZE + 'px';
+            asciiNativeWidth = asciiEl.scrollWidth;
+            asciiEl.style.fontSize = ''; // clear so we can set the real value next
+        }
 
-function scaleAsciiArt() {
-    // Available width = the header container (which tracks the left pane width)
-    const availableW = headerOverlay.getBoundingClientRect().width;
-    if (availableW <= 0 || asciiNativeWidth <= 0) return;
+        function scaleAsciiArt() {
+            // Available width = the header container (which tracks the left pane width)
+            const availableW = headerOverlay.getBoundingClientRect().width;
+            if (availableW <= 0 || asciiNativeWidth <= 0) return;
 
-    // Linear ratio: how much we need to shrink
-    let scale = availableW / asciiNativeWidth;
-    // Cap at the reference size (never blow it up beyond native)
-    scale = Math.min(scale, 1);
-    // Clamp to a readable minimum
-    const fontSize = Math.max(scale * REF_FONT_SIZE, 5);
-    asciiEl.style.fontSize = fontSize + 'px';
-}
+            // Linear ratio: how much we need to shrink
+            let scale = availableW / asciiNativeWidth;
+            // Cap at the reference size (never blow it up beyond native)
+            scale = Math.min(scale, 1);
+            // Clamp to a readable minimum
+            const fontSize = Math.max(scale * REF_FONT_SIZE, 5);
+            asciiEl.style.fontSize = fontSize + 'px';
+        }
 
-// Initial measure + scale
-measureAsciiNativeWidth();
-scaleAsciiArt();
+        // Initial measure + scale
+        measureAsciiNativeWidth();
+        scaleAsciiArt();
 
-// ─────────────────────────────────────────────
-// PLASMA ANIMATION
-// ─────────────────────────────────────────────
-class AsciiScreen {
-    constructor(container, config = {}) {
-        this.container = container;
-        this.config = config;
-        this.palette = config.palette || ['#ffffff'];
-        this.canvas = document.createElement('canvas');
-        this.ctx = this.canvas.getContext('2d', { alpha: false });
-        this.container.appendChild(this.canvas);
-        this.fontSize = 14;
-        this.fontFamily = 'Courier New, Courier, monospace';
-        this.resize();
-        // window resize is one trigger; reflow() after open/close is the other
-        window.addEventListener('resize', () => this.resize());
-    }
-    resize() {
-        const rect = this.container.getBoundingClientRect();
-        const w = rect.width, h = rect.height;
-        if (w <= 0 || h <= 0) return; // pane is collapsed, skip
-        this.ctx.font = `${this.fontSize}px ${this.fontFamily}`;
-        const m = this.ctx.measureText('W');
-        this.charW = Math.ceil(m.width);
-        this.charH = Math.ceil(this.fontSize * 1.15);
-        this.cols = Math.floor(w / this.charW);
-        this.rows = Math.floor(h / this.charH);
-        const dpr = window.devicePixelRatio || 1;
-        this.canvas.width = w * dpr;
-        this.canvas.height = h * dpr;
-        this.canvas.style.width = `${w}px`;
-        this.canvas.style.height = `${h}px`;
-        this.ctx.scale(dpr, dpr);
-        this.ctx.font = `${this.fontSize}px ${this.fontFamily}`;
-        this.ctx.textBaseline = 'top';
-        this.ctx.textAlign = 'center';
-        const size = this.cols * this.rows;
-        this.data = new Array(size).fill(' ');
-        this.colors = new Uint8Array(size).fill(0);
-    }
-    clear() { this.data.fill(' '); }
-    put(x, y, char, colorIdx = 0) {
-        if (x < 0 || x >= this.cols || y < 0 || y >= this.rows) return;
-        const i = y * this.cols + x;
-        this.data[i] = char;
-        this.colors[i] = colorIdx;
-    }
-    render() {
-        const cw = this.charW, ch = this.charH;
-        this.ctx.fillStyle = this.config.bgColor || '#000000';
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        for (let y = 0; y < this.rows; y++) {
-            for (let x = 0; x < this.cols; x++) {
+        // ─────────────────────────────────────────────
+        // PLASMA ANIMATION
+        // ─────────────────────────────────────────────
+        class AsciiScreen {
+            constructor(container, config = {}) {
+                this.container = container;
+                this.config = config;
+                this.palette = config.palette || ['#ffffff'];
+                this.canvas = document.createElement('canvas');
+                this.ctx = this.canvas.getContext('2d', { alpha: false });
+                this.container.appendChild(this.canvas);
+                this.fontSize = 14;
+                this.fontFamily = 'Courier New, Courier, monospace';
+                this.resize();
+                // window resize is one trigger; reflow() after open/close is the other
+                window.addEventListener('resize', () => this.resize());
+            }
+            resize() {
+                const rect = this.container.getBoundingClientRect();
+                const w = rect.width, h = rect.height;
+                if (w <= 0 || h <= 0) return; // pane is collapsed, skip
+                this.ctx.font = `${this.fontSize}px ${this.fontFamily}`;
+                const m = this.ctx.measureText('W');
+                this.charW = Math.ceil(m.width);
+                this.charH = Math.ceil(this.fontSize * 1.15);
+                this.cols = Math.floor(w / this.charW);
+                this.rows = Math.floor(h / this.charH);
+                const dpr = window.devicePixelRatio || 1;
+                this.canvas.width = w * dpr;
+                this.canvas.height = h * dpr;
+                this.canvas.style.width = `${w}px`;
+                this.canvas.style.height = `${h}px`;
+                this.ctx.scale(dpr, dpr);
+                this.ctx.font = `${this.fontSize}px ${this.fontFamily}`;
+                this.ctx.textBaseline = 'top';
+                this.ctx.textAlign = 'center';
+                const size = this.cols * this.rows;
+                this.data = new Array(size).fill(' ');
+                this.colors = new Uint8Array(size).fill(0);
+            }
+            clear() { this.data.fill(' '); }
+            put(x, y, char, colorIdx = 0) {
+                if (x < 0 || x >= this.cols || y < 0 || y >= this.rows) return;
                 const i = y * this.cols + x;
-                const char = this.data[i];
-                if (!char || char === ' ') continue;
-                this.ctx.fillStyle = this.palette[this.colors[i] % this.palette.length];
-                this.ctx.fillText(char, x * cw + (cw / 2), y * ch);
+                this.data[i] = char;
+                this.colors[i] = colorIdx;
+            }
+            render() {
+                const cw = this.charW, ch = this.charH;
+                this.ctx.fillStyle = this.config.bgColor || '#000000';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                for (let y = 0; y < this.rows; y++) {
+                    for (let x = 0; x < this.cols; x++) {
+                        const i = y * this.cols + x;
+                        const char = this.data[i];
+                        if (!char || char === ' ') continue;
+                        this.ctx.fillStyle = this.palette[this.colors[i] % this.palette.length];
+                        this.ctx.fillText(char, x * cw + (cw / 2), y * ch);
+                    }
+                }
             }
         }
-    }
-}
 
-const plasmaContainer = document.getElementById('plasma-bg');
-const screen = new AsciiScreen(plasmaContainer, {
-    palette: ["#164e82", "#1f6feb", "#58a6ff", "#b6e3ff"],
-    bgColor: "#000000"
-});
-const CHARS = " .:`',:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$";
+        const plasmaContainer = document.getElementById('plasma-bg');
+        const screen = new AsciiScreen(plasmaContainer, {
+            palette: ["#164e82", "#1f6feb", "#58a6ff", "#b6e3ff"],
+            bgColor: "#000000"
+        });
+        const CHARS = " .:`',:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$";
 
-function drawPlasma(t) {
-    const cols = screen.cols, rows = screen.rows;
-    screen.clear();
-    const xScale = 0.08, yScale = 0.15;
-    for (let y = 0; y < rows; y++) {
-        for (let x = 0; x < cols; x++) {
-            const u = x * xScale, v = y * yScale;
-            let val = Math.sin(u + t * 1.2);
-            val += Math.sin((v + u) * 0.8 + t);
-            val += Math.sin(Math.sqrt(u * u + v * v) * 2.0 + t);
-            let density = Math.pow((val + 3) / 6, 1.5);
-            const d = Math.max(0, Math.min(1, density));
-            screen.put(x, y, CHARS[Math.floor(d * (CHARS.length - 1))], Math.floor(density * 10 + t * 0.8) % 4);
-        }
-    }
-    screen.render();
-}
-let startTime = performance.now();
-function plasmaLoop(now) {
-    drawPlasma((now - startTime) / 1000 * 0.6);
-    requestAnimationFrame(plasmaLoop);
-}
-requestAnimationFrame(plasmaLoop);
-
-// ─────────────────────────────────────────────
-// REFLOW: re-measure plasma canvas + ascii after any pane change
-// ─────────────────────────────────────────────
-const paneLeft = document.getElementById('paneLeft');
-const paneRight = document.getElementById('paneRight');
-
-function reflow() {
-    screen.resize();
-    scaleAsciiArt();
-}
-
-// Also reflow on plain window resize
-window.addEventListener('resize', reflow);
-
-// ─────────────────────────────────────────────
-// TMUX SPLIT / NAVIGATION LOGIC
-// ─────────────────────────────────────────────
-const previewFrame = document.getElementById('previewFrame');
-const previewTitle = document.getElementById('previewTitle');
-const closePreview = document.getElementById('closePreview');
-const statusPanes = document.getElementById('statusPanes');
-
-const navItems = Array.from(document.querySelectorAll('.nav-item[data-project]'));
-let focusIdx = 0;
-
-function setFocus(idx) {
-    navItems.forEach((el, i) => {
-        el.classList.toggle('focused', i === idx);
-    });
-    focusIdx = idx;
-}
-
-function openProject(idx) {
-    const item = navItems[idx];
-    if (!item) return;
-    const key = item.dataset.project;
-    const title = item.dataset.title;
-    const html = PROJECTS[key];
-    if (!html) return;
-
-    previewTitle.textContent = title;
-
-    const blob = new Blob([html], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    previewFrame.src = url;
-
-    paneLeft.classList.add('split');
-    paneRight.classList.add('open');
-    statusPanes.textContent = '[1/2]';
-    reflow();
-}
-
-function closeProject() {
-    paneLeft.classList.remove('split');
-    paneRight.classList.remove('open');
-    previewFrame.src = 'about:blank';
-    statusPanes.textContent = '[1/1]';
-    reflow();
-}
-
-// Click handlers on nav items
-navItems.forEach((item, i) => {
-    item.addEventListener('click', () => {
-        setFocus(i);
-        openProject(i);
-    });
-});
-
-// Close button
-closePreview.addEventListener('click', closeProject);
-
-// ─── KEYBOARD NAVIGATION ───
-document.addEventListener('keydown', (e) => {
-    if (document.activeElement === previewFrame) return;
-
-    switch (e.key) {
-        case 'ArrowDown':
-            e.preventDefault();
-            setFocus(Math.min(focusIdx + 1, navItems.length - 1));
-            navItems[focusIdx].scrollIntoView({ block: 'nearest' });
-            break;
-        case 'ArrowUp':
-            e.preventDefault();
-            setFocus(Math.max(focusIdx - 1, 0));
-            navItems[focusIdx].scrollIntoView({ block: 'nearest' });
-            break;
-        case 'Enter':
-            e.preventDefault();
-            openProject(focusIdx);
-            break;
-        case 'Escape':
-            if (paneRight.classList.contains('open')) {
-                e.preventDefault();
-                closeProject();
+        function drawPlasma(t) {
+            const cols = screen.cols, rows = screen.rows;
+            screen.clear();
+            const xScale = 0.08, yScale = 0.15;
+            for (let y = 0; y < rows; y++) {
+                for (let x = 0; x < cols; x++) {
+                    const u = x * xScale, v = y * yScale;
+                    let val = Math.sin(u + t * 1.2);
+                    val += Math.sin((v + u) * 0.8 + t);
+                    val += Math.sin(Math.sqrt(u * u + v * v) * 2.0 + t);
+                    let density = Math.pow((val + 3) / 6, 1.5);
+                    const d = Math.max(0, Math.min(1, density));
+                    screen.put(x, y, CHARS[Math.floor(d * (CHARS.length - 1))], Math.floor(density * 10 + t * 0.8) % 4);
+                }
             }
-            break;
-    }
-});
+            screen.render();
+        }
+        let startTime = performance.now();
+        function plasmaLoop(now) {
+            drawPlasma((now - startTime) / 1000 * 0.6);
+            requestAnimationFrame(plasmaLoop);
+        }
+        requestAnimationFrame(plasmaLoop);
 
-// Initial focus
-setFocus(0);
-</script>
+        // ─────────────────────────────────────────────
+        // REFLOW: re-measure plasma canvas + ascii after any pane change
+        // ─────────────────────────────────────────────
+        const paneLeft = document.getElementById('paneLeft');
+        const paneRight = document.getElementById('paneRight');
+
+        function reflow() {
+            screen.resize();
+            scaleAsciiArt();
+        }
+
+        // Also reflow on plain window resize
+        window.addEventListener('resize', reflow);
+
+        // ─────────────────────────────────────────────
+        // TMUX SPLIT / NAVIGATION LOGIC
+        // ─────────────────────────────────────────────
+        const previewFrame = document.getElementById('previewFrame');
+        const previewTitle = document.getElementById('previewTitle');
+        const closePreview = document.getElementById('closePreview');
+        const statusPanes = document.getElementById('statusPanes');
+
+        const navItems = Array.from(document.querySelectorAll('.nav-item[data-project]'));
+        let focusIdx = 0;
+
+        function setFocus(idx) {
+            navItems.forEach((el, i) => {
+                el.classList.toggle('focused', i === idx);
+            });
+            focusIdx = idx;
+        }
+
+        function openProject(idx) {
+            const item = navItems[idx];
+            if (!item) return;
+            const key = item.dataset.project;
+            const title = item.dataset.title;
+            const html = PROJECTS[key];
+            if (!html) return;
+
+            previewTitle.textContent = title;
+
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            previewFrame.src = url;
+
+            paneLeft.classList.add('split');
+            paneRight.classList.add('open');
+            statusPanes.textContent = '[1/2]';
+            reflow();
+        }
+
+        function closeProject() {
+            paneLeft.classList.remove('split');
+            paneRight.classList.remove('open');
+            previewFrame.src = 'about:blank';
+            statusPanes.textContent = '[1/1]';
+            reflow();
+        }
+
+        // Click handlers on nav items
+        navItems.forEach((item, i) => {
+            item.addEventListener('click', () => {
+                setFocus(i);
+                openProject(i);
+            });
+        });
+
+        // Close button
+        closePreview.addEventListener('click', closeProject);
+
+        // ─── KEYBOARD NAVIGATION ───
+        document.addEventListener('keydown', (e) => {
+            if (document.activeElement === previewFrame) return;
+
+            switch (e.key) {
+                case 'ArrowDown':
+                    e.preventDefault();
+                    setFocus(Math.min(focusIdx + 1, navItems.length - 1));
+                    navItems[focusIdx].scrollIntoView({ block: 'nearest' });
+                    break;
+                case 'ArrowUp':
+                    e.preventDefault();
+                    setFocus(Math.max(focusIdx - 1, 0));
+                    navItems[focusIdx].scrollIntoView({ block: 'nearest' });
+                    break;
+                case 'Enter':
+                    e.preventDefault();
+                    openProject(focusIdx);
+                    break;
+                case 'Escape':
+                    if (paneRight.classList.contains('open')) {
+                        e.preventDefault();
+                        closeProject();
+                    }
+                    break;
+            }
+        });
+
+        // Initial focus
+        setFocus(0);
+    </script>
 </body>
+
 </html>
