@@ -9,6 +9,7 @@ const headerOverlay = document.querySelector('.header-overlay');
 
 // We measure once at a large reference size to know the "native" pixel width.
 const REF_FONT_SIZE = 13; // px — max size the art will ever render at
+const ASCII_SIDE_MARGIN = 24; // px on each side
 let asciiNativeWidth = 0;
 
 function measureAsciiNativeWidth() {
@@ -20,7 +21,8 @@ function measureAsciiNativeWidth() {
 
 function scaleAsciiArt() {
     // Available width = the header container (which tracks the left pane width)
-    const availableW = headerOverlay.getBoundingClientRect().width;
+    const containerW = headerOverlay.getBoundingClientRect().width;
+    const availableW = Math.max(containerW - (ASCII_SIDE_MARGIN * 2), 0);
     if (availableW <= 0 || asciiNativeWidth <= 0) return;
 
     // Linear ratio: how much we need to shrink
@@ -47,7 +49,7 @@ class AsciiScreen {
         this.canvas = document.createElement('canvas');
         this.ctx = this.canvas.getContext('2d', { alpha: false });
         this.container.appendChild(this.canvas);
-        this.fontSize = 11;
+        this.fontSize = 9;
         this.fontFamily = 'Courier New, Courier, monospace';
         this.resize();
         // window resize is one trigger; reflow() after open/close is the other
