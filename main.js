@@ -216,8 +216,8 @@ document.addEventListener('gestureend', (e) => e.preventDefault(), { passive: fa
 const paneLeft = document.getElementById('paneLeft');
 const paneRight = document.getElementById('paneRight');
 const leftScroll = document.getElementById('leftScroll');
-const leftPaneZoom = { scale: 1, x: 0, y: 0 };
-const rightPaneZoom = { scale: 1, x: 0, y: 0 };
+let leftPaneScale = 1;
+let rightPaneScale = 1;
 
 function getTouchDistance(t1, t2) {
     const dx = t1.clientX - t2.clientX;
@@ -225,127 +225,67 @@ function getTouchDistance(t1, t2) {
     return Math.hypot(dx, dy);
 }
 
-function getTouchCenter(t1, t2) {
-    return {
-        x: (t1.clientX + t2.clientX) / 2,
-        y: (t1.clientY + t2.clientY) / 2
-    };
-}
-
 function clamp(value, min, max) {
     return Math.min(Math.max(value, min), max);
 }
 
-function applyElementZoom(el, zoomState) {
+function applyElementZoom(el, scale) {
     if (!el) return;
-    el.style.transformOrigin = '0 0';
-    el.style.transform = `translate(${zoomState.x}px, ${zoomState.y}px) scale(${zoomState.scale})`;
-}
-
-function clampZoomTranslation(el, zoomState) {
-    if (!el) return;
-    const scale = zoomState.scale;
-    if (scale <= 1.001) {
-        zoomState.scale = 1;
-        zoomState.x = 0;
-        zoomState.y = 0;
-        return;
+    if (CSS.supports('zoom', '1')) {
+        el.style.zoom = scale.toFixed(3);
+    } else {
+        el.style.transformOrigin = 'top left';
+        el.style.transform = `scale(${scale})`;
     }
-    const maxOffsetX = (el.clientWidth * (scale - 1));
-    const maxOffsetY = (el.clientHeight * (scale - 1));
-    zoomState.x = clamp(zoomState.x, -maxOffsetX, 0);
-    zoomState.y = clamp(zoomState.y, -maxOffsetY, 0);
 }
 
-function applyPinchFromAnchor(el, zoomState, anchor, nextScale) {
-    if (!el) return;
-    const scale = clamp(nextScale, 1, 2.5);
-    const rect = el.getBoundingClientRect();
-
-    zoomState.scale = scale;
-    zoomState.x = (anchor.clientX - rect.left) - (anchor.localX * scale);
-    zoomState.y = (anchor.clientY - rect.top) - (anchor.localY * scale);
-    clampZoomTranslation(el, zoomState);
-    applyElementZoom(el, zoomState);
-}
-
-function addPinchZoom(target, getScale, onScaleChange) {
+function addPinchZoom(target, getScale, setScale) {
     if (!target) return;
     let isPinching = false;
     let pinchStartDistance = 0;
     let pinchStartScale = 1;
-    let pinchAnchor = null;
 
     target.addEventListener('touchstart', (e) => {
         if (e.touches.length !== 2) return;
         isPinching = true;
         pinchStartDistance = getTouchDistance(e.touches[0], e.touches[1]);
         pinchStartScale = getScale();
-        const center = getTouchCenter(e.touches[0], e.touches[1]);
-        const rect = target.getBoundingClientRect();
-        const state = onScaleChange.getState();
-        pinchAnchor = {
-            clientX: center.x,
-            clientY: center.y,
-            localX: (center.x - rect.left - state.x) / state.scale,
-            localY: (center.y - rect.top - state.y) / state.scale
-        };
     }, { passive: true });
 
     target.addEventListener('touchmove', (e) => {
         if (!isPinching || e.touches.length !== 2) return;
         const distance = getTouchDistance(e.touches[0], e.touches[1]);
-        if (!pinchStartDistance || !pinchAnchor) return;
+        if (!pinchStartDistance) return;
         e.preventDefault();
-        const center = getTouchCenter(e.touches[0], e.touches[1]);
-        pinchAnchor.clientX = center.x;
-        pinchAnchor.clientY = center.y;
         const nextScale = clamp(pinchStartScale * (distance / pinchStartDistance), 1, 2.5);
-        onScaleChange(nextScale, pinchAnchor);
+        setScale(nextScale);
     }, { passive: false });
 
-    const stopPinch = () => { isPinching = false; pinchAnchor = null; };
+    const stopPinch = () => { isPinching = false; };
     target.addEventListener('touchend', stopPinch, { passive: true });
     target.addEventListener('touchcancel', stopPinch, { passive: true });
 }
 
-function addSafariGesturePinch(target, getScale, onScaleChange) {
+function addSafariGesturePinch(target, getScale, setScale) {
     if (!target) return;
     let gestureBaseScale = 1;
     let gestureStartScale = 1;
-    let gestureAnchor = null;
 
     target.addEventListener('gesturestart', (e) => {
         e.preventDefault();
         gestureBaseScale = getScale();
         gestureStartScale = e.scale || 1;
-        const rect = target.getBoundingClientRect ? target.getBoundingClientRect() : { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight };
-        const x = typeof e.clientX === 'number' ? e.clientX : rect.left + (rect.width / 2);
-        const y = typeof e.clientY === 'number' ? e.clientY : rect.top + (rect.height / 2);
-        const state = onScaleChange.getState();
-        gestureAnchor = {
-            clientX: x,
-            clientY: y,
-            localX: (x - rect.left - state.x) / state.scale,
-            localY: (y - rect.top - state.y) / state.scale
-        };
     }, { passive: false });
 
     target.addEventListener('gesturechange', (e) => {
         e.preventDefault();
-        if (!gestureAnchor) return;
         const current = e.scale || 1;
         const ratio = current / (gestureStartScale || 1);
-        if (typeof e.clientX === 'number' && typeof e.clientY === 'number') {
-            gestureAnchor.clientX = e.clientX;
-            gestureAnchor.clientY = e.clientY;
-        }
-        onScaleChange(clamp(gestureBaseScale * ratio, 1, 2.5), gestureAnchor);
+        setScale(clamp(gestureBaseScale * ratio, 1, 2.5));
     }, { passive: false });
 
     target.addEventListener('gestureend', (e) => {
         e.preventDefault();
-        gestureAnchor = null;
     }, { passive: false });
 }
 
@@ -361,22 +301,20 @@ window.addEventListener('resize', reflow);
 if (leftScroll) {
     addPinchZoom(
         leftScroll,
-        () => leftPaneZoom.scale,
-        Object.assign((scale, anchor) => {
-            applyPinchFromAnchor(leftScroll, leftPaneZoom, anchor, scale);
-        }, {
-            getState: () => leftPaneZoom
-        })
+        () => leftPaneScale,
+        (scale) => {
+            leftPaneScale = scale;
+            applyElementZoom(leftScroll, leftPaneScale);
+        }
     );
     addSafariGesturePinch(
         leftScroll,
-        () => leftPaneZoom.scale,
-        Object.assign((scale, anchor) => {
-            applyPinchFromAnchor(leftScroll, leftPaneZoom, anchor, scale);
-        }, {
-            getState: () => leftPaneZoom
+        () => leftPaneScale,
+        (scale) => {
+            leftPaneScale = scale;
+            applyElementZoom(leftScroll, leftPaneScale);
         }
-    ));
+    );
 
     leftScroll.addEventListener('wheel', (e) => {
         e.preventDefault();
@@ -402,22 +340,20 @@ function bindPreviewPanePinchZoom() {
         const frameRoot = frameDoc.scrollingElement || frameDoc.documentElement;
         addPinchZoom(
             frameDoc,
-            () => rightPaneZoom.scale,
-            Object.assign((scale, anchor) => {
-                applyPinchFromAnchor(frameRoot, rightPaneZoom, anchor, scale);
-            }, {
-                getState: () => rightPaneZoom
-            })
+            () => rightPaneScale,
+            (scale) => {
+                rightPaneScale = scale;
+                applyElementZoom(frameRoot, rightPaneScale);
+            }
         );
         addSafariGesturePinch(
             frameDoc,
-            () => rightPaneZoom.scale,
-            Object.assign((scale, anchor) => {
-                applyPinchFromAnchor(frameRoot, rightPaneZoom, anchor, scale);
-            }, {
-                getState: () => rightPaneZoom
+            () => rightPaneScale,
+            (scale) => {
+                rightPaneScale = scale;
+                applyElementZoom(frameRoot, rightPaneScale);
             }
-        ));
+        );
     } catch {
         // If iframe access is restricted, skip custom pinch for preview pane.
     }
