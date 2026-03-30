@@ -205,6 +205,11 @@ if (window.matchMedia('(pointer: coarse)').matches) {
     }, { passive: false });
 }
 
+// Block browser-level pinch zoom; pane-level custom pinch handlers take over.
+document.addEventListener('gesturestart', (e) => e.preventDefault(), { passive: false });
+document.addEventListener('gesturechange', (e) => e.preventDefault(), { passive: false });
+document.addEventListener('gestureend', (e) => e.preventDefault(), { passive: false });
+
 // ─────────────────────────────────────────────
 // REFLOW: re-measure plasma canvas + ascii after any pane change
 // ─────────────────────────────────────────────
@@ -261,6 +266,29 @@ function addPinchZoom(target, getScale, setScale) {
     target.addEventListener('touchcancel', stopPinch, { passive: true });
 }
 
+function addSafariGesturePinch(target, getScale, setScale) {
+    if (!target) return;
+    let gestureBaseScale = 1;
+    let gestureStartScale = 1;
+
+    target.addEventListener('gesturestart', (e) => {
+        e.preventDefault();
+        gestureBaseScale = getScale();
+        gestureStartScale = e.scale || 1;
+    }, { passive: false });
+
+    target.addEventListener('gesturechange', (e) => {
+        e.preventDefault();
+        const current = e.scale || 1;
+        const ratio = current / (gestureStartScale || 1);
+        setScale(clamp(gestureBaseScale * ratio, 1, 2.5));
+    }, { passive: false });
+
+    target.addEventListener('gestureend', (e) => {
+        e.preventDefault();
+    }, { passive: false });
+}
+
 function reflow() {
     screen.resize();
     scaleAsciiArt();
@@ -272,6 +300,14 @@ window.addEventListener('resize', reflow);
 // Prevent elastic overscroll on the left pane by clamping wheel scrolling.
 if (leftScroll) {
     addPinchZoom(
+        leftScroll,
+        () => leftPaneScale,
+        (scale) => {
+            leftPaneScale = scale;
+            applyElementZoom(leftScroll, leftPaneScale);
+        }
+    );
+    addSafariGesturePinch(
         leftScroll,
         () => leftPaneScale,
         (scale) => {
@@ -303,6 +339,14 @@ function bindPreviewPanePinchZoom() {
         if (!frameDoc) return;
         const frameRoot = frameDoc.scrollingElement || frameDoc.documentElement;
         addPinchZoom(
+            frameDoc,
+            () => rightPaneScale,
+            (scale) => {
+                rightPaneScale = scale;
+                applyElementZoom(frameRoot, rightPaneScale);
+            }
+        );
+        addSafariGesturePinch(
             frameDoc,
             () => rightPaneScale,
             (scale) => {
