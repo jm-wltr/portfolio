@@ -25,6 +25,13 @@
     --preview-bg: #0b1730;
 }
 
+html {
+    height: 100%;
+    background: var(--bg);
+    overflow: hidden;
+    overscroll-behavior: none;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -32,6 +39,7 @@
 }
 
 body {
+    min-height: 100%;
     background: var(--bg);
     color: var(--text);
     font-family: 'Courier New', Courier, monospace;
@@ -41,6 +49,7 @@ body {
     overflow: hidden;
     user-select: none;
     zoom: var(--ui-scale);
+    overscroll-behavior: none;
 }
 
 @supports not (zoom: 1) {
@@ -145,6 +154,7 @@ body {
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
+    overscroll-behavior-y: contain;
     scrollbar-width: none;
 }
 

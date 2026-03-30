@@ -193,11 +193,24 @@ function plasmaLoop(now) {
 }
 requestAnimationFrame(plasmaLoop);
 
+// Prevent double-tap zoom on touch devices.
+if (window.matchMedia('(pointer: coarse)').matches) {
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', (e) => {
+        const now = Date.now();
+        if (now - lastTouchEnd < 350) {
+            e.preventDefault();
+        }
+        lastTouchEnd = now;
+    }, { passive: false });
+}
+
 // ─────────────────────────────────────────────
 // REFLOW: re-measure plasma canvas + ascii after any pane change
 // ─────────────────────────────────────────────
 const paneLeft = document.getElementById('paneLeft');
 const paneRight = document.getElementById('paneRight');
+const leftScroll = document.getElementById('leftScroll');
 
 function reflow() {
     screen.resize();
@@ -206,6 +219,16 @@ function reflow() {
 
 // Also reflow on plain window resize
 window.addEventListener('resize', reflow);
+
+// Prevent elastic overscroll on the left pane by clamping wheel scrolling.
+if (leftScroll) {
+    leftScroll.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const maxScrollTop = Math.max(leftScroll.scrollHeight - leftScroll.clientHeight, 0);
+        const next = leftScroll.scrollTop + e.deltaY;
+        leftScroll.scrollTop = Math.min(Math.max(next, 0), maxScrollTop);
+    }, { passive: false });
+}
 
 // ─────────────────────────────────────────────
 // TMUX SPLIT / NAVIGATION LOGIC
