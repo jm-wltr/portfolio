@@ -39,6 +39,56 @@ measureAsciiNativeWidth();
 scaleAsciiArt();
 
 // ─────────────────────────────────────────────
+// THEME TOGGLE (system by default, then manual)
+// ─────────────────────────────────────────────
+const root = document.documentElement;
+const themeToggle = document.getElementById('themeToggle');
+const THEME_STORAGE_KEY = 'theme-preference';
+const systemThemeQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+let themePreference = localStorage.getItem(THEME_STORAGE_KEY);
+if (themePreference !== 'light' && themePreference !== 'dark') {
+    themePreference = null;
+}
+
+function getEffectiveTheme() {
+    if (themePreference) return themePreference;
+    return systemThemeQuery.matches ? 'dark' : 'light';
+}
+
+function updateThemeToggle() {
+    if (!themeToggle) return;
+    const effective = getEffectiveTheme();
+    const usingSystem = themePreference === null;
+    themeToggle.textContent = effective === 'light' ? 'D' : 'L';
+    themeToggle.title = usingSystem
+        ? `Theme: ${effective} (system). Click to switch to ${effective === 'light' ? 'dark' : 'light'}.`
+        : `Theme: ${effective} (manual). Click to switch to ${effective === 'light' ? 'dark' : 'light'}.`;
+    themeToggle.setAttribute('aria-label', `Switch to ${effective === 'light' ? 'dark' : 'light'} mode`);
+}
+
+function applyThemePreference() {
+    const effectiveTheme = getEffectiveTheme();
+    root.dataset.theme = effectiveTheme;
+    applyPlasmaTheme(effectiveTheme === 'light');
+    updateThemeToggle();
+}
+
+if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+        themePreference = getEffectiveTheme() === 'light' ? 'dark' : 'light';
+        localStorage.setItem(THEME_STORAGE_KEY, themePreference);
+        applyThemePreference();
+    });
+}
+
+systemThemeQuery.addEventListener('change', () => {
+    if (themePreference === null) {
+        applyThemePreference();
+    }
+});
+
+// ─────────────────────────────────────────────
 // PLASMA ANIMATION
 // ─────────────────────────────────────────────
 class AsciiScreen {
@@ -107,7 +157,6 @@ const screen = new AsciiScreen(plasmaContainer, {
     bgColor: "#000000"
 });
 
-const plasmaThemeQuery = window.matchMedia('(prefers-color-scheme: light)');
 function applyPlasmaTheme(isLight) {
     if (isLight) {
         screen.palette = ["#3e6aa1", "#4b7cc7", "#5b90e6", "#8cb6ff"];
@@ -117,8 +166,7 @@ function applyPlasmaTheme(isLight) {
         screen.config.bgColor = "#000000";
     }
 }
-applyPlasmaTheme(plasmaThemeQuery.matches);
-plasmaThemeQuery.addEventListener('change', (e) => applyPlasmaTheme(e.matches));
+applyThemePreference();
 const CHARS = " .:`',:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$";
 
 function drawPlasma(t) {
