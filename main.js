@@ -213,7 +213,6 @@ window.addEventListener('resize', reflow);
 const previewFrame = document.getElementById('previewFrame');
 const previewTitle = document.getElementById('previewTitle');
 const closePreview = document.getElementById('closePreview');
-const statusPanes = document.getElementById('statusPanes');
 
 const navItems = Array.from(document.querySelectorAll('.nav-item[data-project]'));
 let focusIdx = 0;
@@ -238,7 +237,6 @@ function openProject(idx) {
 
     paneLeft.classList.add('split');
     paneRight.classList.add('open');
-    statusPanes.textContent = '[1/2]';
     reflow();
 }
 
@@ -246,7 +244,6 @@ function closeProject() {
     paneLeft.classList.remove('split');
     paneRight.classList.remove('open');
     previewFrame.src = 'about:blank';
-    statusPanes.textContent = '[1/1]';
     reflow();
 }
 
