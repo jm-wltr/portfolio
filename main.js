@@ -211,6 +211,55 @@ if (window.matchMedia('(pointer: coarse)').matches) {
 const paneLeft = document.getElementById('paneLeft');
 const paneRight = document.getElementById('paneRight');
 const leftScroll = document.getElementById('leftScroll');
+let leftPaneScale = 1;
+let rightPaneScale = 1;
+
+function getTouchDistance(t1, t2) {
+    const dx = t1.clientX - t2.clientX;
+    const dy = t1.clientY - t2.clientY;
+    return Math.hypot(dx, dy);
+}
+
+function clamp(value, min, max) {
+    return Math.min(Math.max(value, min), max);
+}
+
+function applyElementZoom(el, scale) {
+    if (!el) return;
+    if (CSS.supports('zoom', '1')) {
+        el.style.zoom = scale.toFixed(3);
+    } else {
+        el.style.transformOrigin = 'top left';
+        el.style.transform = `scale(${scale})`;
+    }
+}
+
+function addPinchZoom(target, getScale, setScale) {
+    if (!target) return;
+    let isPinching = false;
+    let pinchStartDistance = 0;
+    let pinchStartScale = 1;
+
+    target.addEventListener('touchstart', (e) => {
+        if (e.touches.length !== 2) return;
+        isPinching = true;
+        pinchStartDistance = getTouchDistance(e.touches[0], e.touches[1]);
+        pinchStartScale = getScale();
+    }, { passive: true });
+
+    target.addEventListener('touchmove', (e) => {
+        if (!isPinching || e.touches.length !== 2) return;
+        const distance = getTouchDistance(e.touches[0], e.touches[1]);
+        if (!pinchStartDistance) return;
+        e.preventDefault();
+        const nextScale = clamp(pinchStartScale * (distance / pinchStartDistance), 1, 2.5);
+        setScale(nextScale);
+    }, { passive: false });
+
+    const stopPinch = () => { isPinching = false; };
+    target.addEventListener('touchend', stopPinch, { passive: true });
+    target.addEventListener('touchcancel', stopPinch, { passive: true });
+}
 
 function reflow() {
     screen.resize();
@@ -222,6 +271,15 @@ window.addEventListener('resize', reflow);
 
 // Prevent elastic overscroll on the left pane by clamping wheel scrolling.
 if (leftScroll) {
+    addPinchZoom(
+        leftScroll,
+        () => leftPaneScale,
+        (scale) => {
+            leftPaneScale = scale;
+            applyElementZoom(leftScroll, leftPaneScale);
+        }
+    );
+
     leftScroll.addEventListener('wheel', (e) => {
         e.preventDefault();
         const maxScrollTop = Math.max(leftScroll.scrollHeight - leftScroll.clientHeight, 0);
@@ -236,6 +294,30 @@ if (leftScroll) {
 const previewFrame = document.getElementById('previewFrame');
 const previewTitle = document.getElementById('previewTitle');
 const closePreview = document.getElementById('closePreview');
+
+function bindPreviewPanePinchZoom() {
+    if (!previewFrame) return;
+
+    try {
+        const frameDoc = previewFrame.contentDocument;
+        if (!frameDoc) return;
+        const frameRoot = frameDoc.scrollingElement || frameDoc.documentElement;
+        addPinchZoom(
+            frameDoc,
+            () => rightPaneScale,
+            (scale) => {
+                rightPaneScale = scale;
+                applyElementZoom(frameRoot, rightPaneScale);
+            }
+        );
+    } catch {
+        // If iframe access is restricted, skip custom pinch for preview pane.
+    }
+}
+
+if (previewFrame) {
+    previewFrame.addEventListener('load', bindPreviewPanePinchZoom);
+}
 
 const navItems = Array.from(document.querySelectorAll('.nav-item[data-project]'));
 let focusIdx = 0;
