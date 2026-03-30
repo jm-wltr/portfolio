@@ -154,7 +154,7 @@ class AsciiScreen {
 const plasmaContainer = document.getElementById('plasma-bg');
 const screen = new AsciiScreen(plasmaContainer, {
     palette: ["#164e82", "#1f6feb", "#58a6ff", "#b6e3ff"],
-    bgColor: "#000000"
+    bgColor: "#070f20"
 });
 
 function applyPlasmaTheme(isLight) {
@@ -162,8 +162,8 @@ function applyPlasmaTheme(isLight) {
         screen.palette = ["#3e6aa1", "#4b7cc7", "#5b90e6", "#8cb6ff"];
         screen.config.bgColor = "#1f2736";
     } else {
-        screen.palette = ["#164e82", "#1f6feb", "#58a6ff", "#b6e3ff"];
-        screen.config.bgColor = "#000000";
+        screen.palette = ["#2d66a8", "#3f8df0", "#7ec0ff", "#d2ecff"];
+        screen.config.bgColor = "#070f20";
     }
 }
 applyThemePreference();
