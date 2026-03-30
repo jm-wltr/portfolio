@@ -187,11 +187,48 @@ function drawPlasma(t) {
     screen.render();
 }
 let startTime = performance.now();
-function plasmaLoop(now) {
-    drawPlasma((now - startTime) / 1000 * 0.6);
-    requestAnimationFrame(plasmaLoop);
+const TARGET_FPS = 60;
+const FRAME_INTERVAL_MS = 1000 / TARGET_FPS;
+let lastFrameTime = 0;
+let plasmaRafId = null;
+let plasmaPaused = false;
+
+function startPlasmaLoop() {
+    if (plasmaRafId !== null) return;
+    plasmaPaused = false;
+    plasmaRafId = requestAnimationFrame(plasmaLoop);
 }
-requestAnimationFrame(plasmaLoop);
+
+function stopPlasmaLoop() {
+    plasmaPaused = true;
+    if (plasmaRafId !== null) {
+        cancelAnimationFrame(plasmaRafId);
+        plasmaRafId = null;
+    }
+}
+
+function plasmaLoop(now) {
+    if (plasmaPaused) {
+        plasmaRafId = null;
+        return;
+    }
+    if (now - lastFrameTime < FRAME_INTERVAL_MS) {
+        plasmaRafId = requestAnimationFrame(plasmaLoop);
+        return;
+    }
+    lastFrameTime = now;
+    drawPlasma((now - startTime) / 1000 * 0.6);
+    plasmaRafId = requestAnimationFrame(plasmaLoop);
+}
+startPlasmaLoop();
+
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+        stopPlasmaLoop();
+    } else {
+        startPlasmaLoop();
+    }
+});
 
 // ─────────────────────────────────────────────
 // REFLOW: re-measure plasma canvas + ascii after any pane change
