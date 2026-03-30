@@ -99,7 +99,8 @@ class AsciiScreen {
         this.canvas = document.createElement('canvas');
         this.ctx = this.canvas.getContext('2d', { alpha: false });
         this.container.appendChild(this.canvas);
-        this.fontSize = 9;
+        this.baseFontSize = 9;
+        this.fontSize = this.baseFontSize;
         this.fontFamily = 'Courier New, Courier, monospace';
         this.resize();
         // window resize is one trigger; reflow() after open/close is the other
@@ -109,12 +110,38 @@ class AsciiScreen {
         const rect = this.container.getBoundingClientRect();
         const w = rect.width, h = rect.height;
         if (w <= 0 || h <= 0) return; // pane is collapsed, skip
-        this.ctx.font = `${this.fontSize}px ${this.fontFamily}`;
-        const m = this.ctx.measureText('W');
-        this.charW = Math.ceil(m.width);
-        this.charH = Math.ceil(this.fontSize * 1.15);
-        this.cols = Math.floor(w / this.charW);
-        this.rows = Math.floor(h / this.charH);
+        const measureGrid = (fontSize) => {
+            this.ctx.font = `${fontSize}px ${this.fontFamily}`;
+            const m = this.ctx.measureText('W');
+            const charW = Math.ceil(m.width);
+            const charH = Math.ceil(fontSize * 1.15);
+            const cols = Math.max(Math.floor(w / charW), 1);
+            const rows = Math.max(Math.floor(h / charH), 1);
+            return { fontSize, charW, charH, cols, rows, cells: cols * rows };
+        };
+
+        const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
+        const maxCells = isCoarsePointer ? 2600 : 5200;
+        const minRows = isCoarsePointer ? 8 : 10;
+
+        let grid = measureGrid(this.baseFontSize);
+        if (grid.cells > maxCells) {
+            // Reduce per-frame load by lowering cell count when grid density is too high.
+            const densityFactor = Math.sqrt(grid.cells / maxCells);
+            grid = measureGrid(this.baseFontSize * densityFactor);
+        }
+
+        // Keep a minimum vertical detail so the banner never collapses to very few rows.
+        if (grid.rows < minRows) {
+            const maxFontForMinRows = Math.max((h / minRows) / 1.15, 1);
+            grid = measureGrid(Math.min(grid.fontSize, maxFontForMinRows));
+        }
+
+        this.fontSize = grid.fontSize;
+        this.charW = grid.charW;
+        this.charH = grid.charH;
+        this.cols = grid.cols;
+        this.rows = grid.rows;
         const dpr = window.devicePixelRatio || 1;
         this.canvas.width = w * dpr;
         this.canvas.height = h * dpr;
@@ -127,6 +154,7 @@ class AsciiScreen {
         const size = this.cols * this.rows;
         this.data = new Array(size).fill(' ');
         this.colors = new Uint8Array(size).fill(0);
+
     }
     clear() { this.data.fill(' '); }
     put(x, y, char, colorIdx = 0) {
@@ -168,7 +196,7 @@ function applyPlasmaTheme(isLight) {
 }
 applyThemePreference();
 const CHARS = " .:`',:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$";
-const PLASMA_X_SCALE = 0.08;
+const PLASMA_X_SCALE = 0.06;
 const PLASMA_Y_SCALE = 0.15;
 
 // Plasma optimization: we precompute spatial math terms once per grid size
