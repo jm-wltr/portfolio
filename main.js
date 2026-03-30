@@ -168,20 +168,59 @@ function applyPlasmaTheme(isLight) {
 }
 applyThemePreference();
 const CHARS = " .:`',:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$";
+const PLASMA_X_SCALE = 0.08;
+const PLASMA_Y_SCALE = 0.15;
+
+// Plasma optimization: we precompute spatial math terms once per grid size
+// instead of recomputing them on every frame.
+let plasmaLookup = null;
+
+function buildPlasmaLookup(cols, rows) {
+    const size = cols * rows;
+    const uTerm = new Float32Array(size);
+    const uvTerm = new Float32Array(size);
+    const radialTerm = new Float32Array(size);
+
+    let i = 0;
+    for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < cols; x++, i++) {
+            // Original per-frame operation: const u = x * xScale;
+            const u = x * PLASMA_X_SCALE;
+            // Original per-frame operation: const v = y * yScale;
+            const v = y * PLASMA_Y_SCALE;
+
+            uTerm[i] = u;
+            // Original per-frame operation: (v + u) * 0.8
+            uvTerm[i] = (v + u) * 0.8;
+            // Original per-frame operation: Math.sqrt(u * u + v * v) * 2.0
+            radialTerm[i] = Math.sqrt((u * u) + (v * v)) * 2.0;
+        }
+    }
+
+    return { cols, rows, uTerm, uvTerm, radialTerm };
+}
 
 function drawPlasma(t) {
     const cols = screen.cols, rows = screen.rows;
+    if (!plasmaLookup || plasmaLookup.cols !== cols || plasmaLookup.rows !== rows) {
+        plasmaLookup = buildPlasmaLookup(cols, rows);
+    }
+
     screen.clear();
-    const xScale = 0.08, yScale = 0.15;
+    let i = 0;
+    const timeA = t * 1.2;
+    const timeB = t;
+    const timeColor = t * 0.8;
+    const { uTerm, uvTerm, radialTerm } = plasmaLookup;
+
     for (let y = 0; y < rows; y++) {
-        for (let x = 0; x < cols; x++) {
-            const u = x * xScale, v = y * yScale;
-            let val = Math.sin(u + t * 1.2);
-            val += Math.sin((v + u) * 0.8 + t);
-            val += Math.sin(Math.sqrt(u * u + v * v) * 2.0 + t);
+        for (let x = 0; x < cols; x++, i++) {
+            let val = Math.sin(uTerm[i] + timeA);
+            val += Math.sin(uvTerm[i] + timeB);
+            val += Math.sin(radialTerm[i] + timeB);
             let density = Math.pow((val + 3) / 6, 1.5);
             const d = Math.max(0, Math.min(1, density));
-            screen.put(x, y, CHARS[Math.floor(d * (CHARS.length - 1))], Math.floor(density * 10 + t * 0.8) % 4);
+            screen.put(x, y, CHARS[Math.floor(d * (CHARS.length - 1))], Math.floor(density * 10 + timeColor) % 4);
         }
     }
     screen.render();
