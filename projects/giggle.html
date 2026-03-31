@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Giggle Search Engine — Jaime Walter</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --yellow-50: #fffbeb;
+      --yellow-100: #fef3c7;
+      --yellow-200: #fde68a;
+      --yellow-400: #fbbf24;
+      --yellow-500: #f59e0b;
+      --yellow-600: #d97706;
+      --yellow-700: #b45309;
+      --amber-50: #fffbeb;
+      --amber-400: #fbbf24;
+      --blue-700: #1d4ed8;
+      --blue-800: #1e40af;
+      --gray-400: #9ca3af;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-900: #111827;
+      --white: #ffffff;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.5;
+      min-height: 100vh;
+      background: linear-gradient(to bottom, var(--yellow-50), var(--amber-50));
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ═══════ HEADER — mimics the Giggle results page header ═══════ */
+    .results-header {
+      background-color: var(--white);
+      border-bottom: 1px solid var(--yellow-200);
+      box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .results-header-content {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.75rem 1rem;
+      max-width: 80rem;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* Giggle logo in header */
+    .logo-small {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 1.875rem;
+      font-weight: 400;
+      cursor: default;
+      line-height: 1;
+      flex-shrink: 0;
+      text-decoration: none;
+    }
+    .logo-g { color: var(--yellow-500); }
+    .logo-i { color: var(--amber-400); }
+    .logo-g2 { color: var(--yellow-600); }
+    .logo-g3 { color: var(--yellow-500); }
+    .logo-l { color: var(--amber-400); }
+    .logo-e { color: var(--yellow-600); }
+    .logo-smile-small {
+      width: 2rem; height: 2rem;
+      color: var(--yellow-500);
+    }
+
+    /* Fake search bar */
+    .fake-search-wrapper {
+      flex: 1;
+      max-width: 700px;
+      position: relative;
+    }
+    .search-icon {
+      position: absolute;
+      left: 1rem; top: 50%;
+      transform: translateY(-50%);
+      width: 1.25rem; height: 1.25rem;
+      color: var(--gray-400);
+    }
+    .fake-search-input {
+      width: 100%;
+      padding: 1.1rem 1rem 1.1rem 3rem;
+      font-size: 1.05rem;
+      border-radius: 9999px;
+      border: 2px solid var(--yellow-200);
+      background-color: var(--white);
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
+      outline: none;
+      color: var(--gray-900);
+      font-family: inherit;
+      cursor: default;
+    }
+
+    /* ═══════ CONTENT — mimics the Giggle results area ═══════ */
+    .results-container {
+      max-width: 48rem;
+      margin: 0 auto;
+      padding: 1.5rem 1rem 3rem;
+      flex: 1;
+      width: 100%;
+    }
+
+    .results-info {
+      font-size: 0.875rem;
+      color: var(--gray-600);
+      margin-bottom: 1.5rem;
+    }
+    .image-previews {
+      margin-bottom: 1.2rem;
+    }
+    .image-preview-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 84px);
+      gap: 0.45rem;
+    }
+    .preview-card {
+      display: block;
+      text-decoration: none;
+      border: 1px solid var(--yellow-200);
+      border-radius: 0.4rem;
+      overflow: hidden;
+      background: var(--white);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.07);
+      width: 84px;
+      height: 84px;
+    }
+    .preview-card:hover {
+      border-color: var(--yellow-400);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .preview-thumb {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
+      background: linear-gradient(to bottom, var(--white), var(--yellow-50));
+    }
+
+    /* Header block — styled as the top search result */
+    header {
+      margin-bottom: 2rem;
+    }
+    header h1 {
+      font-size: 1.8rem;
+      color: var(--blue-700);
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+      line-height: 1.3;
+      text-decoration: underline;
+    }
+    header p {
+      font-size: 0.95rem;
+      color: var(--gray-600);
+      margin-bottom: 0.15rem;
+    }
+    header p:last-child {
+      margin-top: 0.3rem;
+      font-size: 0.85rem;
+      color: var(--gray-400);
+      font-style: italic;
+    }
+
+    /* Sections — each styled like a search result */
+    section {
+      margin-bottom: 2rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+    section:last-of-type {
+      border-bottom: none;
+    }
+
+    h2 {
+      font-size: 1.25rem;
+      color: var(--blue-700);
+      font-weight: 400;
+      margin-bottom: 0.5rem;
+      cursor: default;
+    }
+
+    h3 {
+      font-size: 0.95rem;
+      color: var(--gray-900);
+      font-weight: 600;
+      margin-top: 1.5rem;
+      margin-bottom: 0.3rem;
+    }
+
+    p {
+      color: var(--gray-700);
+      line-height: 1.625;
+      margin-bottom: 0.6rem;
+      font-size: 0.935rem;
+    }
+
+    strong { color: #3c4043; }
+
+    a { color: var(--blue-700); text-decoration: none; }
+    a:hover { text-decoration: underline; color: var(--blue-800); }
+
+    code {
+      display: inline;
+      white-space: normal;
+      font-family: 'SF Mono', 'Fira Code', 'Fira Mono', 'Roboto Mono', monospace;
+      font-size: 0.85em;
+      background: rgba(0,0,0,0.04);
+      padding: 0.15em 0.4em;
+      border-radius: 3px;
+      color: var(--gray-900);
+    }
+
+    ul {
+      margin: 0.5rem 0 0.8rem 1.2rem;
+      color: var(--gray-700);
+      font-size: 0.935rem;
+    }
+    li {
+      margin-bottom: 0.4rem;
+      line-height: 1.6;
+    }
+
+    figure.diagram {
+      margin: 1rem 0 1.25rem;
+      border: 1px solid var(--yellow-200);
+      background: linear-gradient(to bottom, var(--white), var(--yellow-50));
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+    .diagram img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    .diagram figcaption {
+      margin-top: 0.5rem;
+      color: var(--gray-600);
+      font-size: 0.82rem;
+      line-height: 1.45;
+    }
+
+    /* Skills — styled as highlighted snippet badges */
+    section:last-of-type p {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    /* Footer — mimics the Giggle results footer */
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      font-size: 0.875rem;
+      color: var(--gray-600);
+    }
+    footer p {
+      color: var(--gray-600);
+      font-size: 0.875rem;
+      text-align: center;
+    }
+
+    /* Fun Giggle-style pagination at the bottom */
+    .giggle-pagination {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin: 2rem 0 0.5rem;
+      font-size: 1.5rem;
+      font-weight: 500;
+      letter-spacing: -1px;
+      user-select: none;
+    }
+    .giggle-pagination span { cursor: default; }
+    .gp-g { color: var(--yellow-500); }
+    .gp-i { color: var(--amber-400); }
+    .gp-g2 { color: var(--yellow-600); font-weight: 700; text-decoration: underline; }
+    .gp-g3 { color: var(--yellow-500); }
+    .gp-g4 { color: var(--yellow-600); }
+    .gp-g5 { color: var(--yellow-500); }
+    .gp-l { color: var(--amber-400); }
+    .gp-e { color: var(--yellow-600); }
+
+    /* Smile icon in the footer area */
+    .smile-footer {
+      margin: 1rem auto 0.5rem;
+      display: block;
+      color: var(--yellow-500);
+    }
+    .footer-msg {
+      color: var(--gray-600);
+      font-size: 0.875rem;
+      text-align: center;
+    }
+
+    /* Responsive */
+    @media (max-width: 40rem) {
+      .logo-small { font-size: 1.4rem; }
+      .logo-smile-small { width: 1.5rem; height: 1.5rem; }
+      .fake-search-input { padding: 0.9rem 1rem 0.9rem 2.8rem; font-size: 0.95rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════ GIGGLE RESULTS HEADER ═══════ -->
+  <div class="results-header">
+    <div class="results-header-content">
+      <div class="logo-small">
+        <span class="logo-g">G</span><span class="logo-i">i</span><span class="logo-g2">g</span><span class="logo-g3">g</span><span class="logo-l">l</span><span class="logo-e">e</span>
+        <svg class="logo-smile-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+          <line x1="9" y1="9" x2="9.01" y2="9"></line>
+          <line x1="15" y1="9" x2="15.01" y2="9"></line>
+        </svg>
+      </div>
+      <div class="fake-search-wrapper">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+        <input type="text" class="fake-search-input" value="What is Giggle?" readonly>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ RESULTS CONTENT ═══════ -->
+  <div class="results-container">
+    <div class="results-info">About 1 result (0.02 seconds)</div>
+    <div class="image-previews" aria-label="Image results previews">
+      <div class="image-preview-grid">
+        <a class="preview-card" href="#diagram-crawler-outer-loop" aria-label="Jump to crawler outer loop diagram">
+          <img class="preview-thumb" src="../crawler_outer_loop.svg" alt="Mini preview of crawler outer loop diagram">
+        </a>
+        <a class="preview-card" href="#diagram-crawler-per-url" aria-label="Jump to crawler per-URL pipeline diagram">
+          <img class="preview-thumb" src="../crawler_per_url_pipeline.svg" alt="Mini preview of per-URL crawler pipeline diagram">
+        </a>
+      </div>
+    </div>
+
+  <header>
+    <h1>Giggle: A Distributed Search Engine from Scratch</h1>
+    <p>CIS 5550 Internet and Web Systems · Fall 2025 · University of Pennsylvania</p>
+    <p>Jaime Walter · Sean D · Rania S · Maxwell Y</p>
+  </header>
+
+  <section>
+    <h2>The project</h2>
+    <p>
+        Together with my team, I built a web search engine as the final project for CIS 5550 (Internet and Web Systems). The system crawls the web, indexes pages, computes PageRank, and serves ranked results through a Google-style frontend. Every layer was written from scratch in Java and deployed on AWS EC2.
+    </p>
+    <p>
+      By the end, we had crawled <strong>500k pages</strong> (300k with valid HTML content) across 5 EC2 workers in under 8 hours, and served search results in an average of <strong>23 milliseconds</strong>.
+    </p>
+  </section>
+
+  <section>
+    <h2>Architecture</h2>
+    <p>
+      The system is a four-layer stack. At the bottom, a <strong>custom web server</strong> handles HTTP parsing, routing, static files, and sessions. On top of that, a <strong>distributed key-value store (KVS)</strong> provides persistent, partitioned storage across workers. Above KVS sits <strong>Flame</strong>, our Apache-Spark-like distributed computing framework that lets you write MapReduce-style jobs using RDDs and PairRDDs. Finally, the application layer runs four jobs — <strong>Crawler, Indexer, PageRank, and SearchServer</strong> — all built on Flame and KVS.
+    </p>
+    <p>
+      The crawler feeds into the indexer, the indexer feeds into PageRank, and all three produce tables that the search server queries at runtime. The frontend is a vanilla HTML/CSS/JS client that talks to the search server over REST.
+    </p>
+  </section>
+
+  <section>
+    <h2>What I built</h2>
+
+    <p>
+        My main focus was optimizing the base components (web server,
+        KVS, Flame) from the homework version, building the
+        crawler, and AWS EC2 deployment. I also contributed to design choices, code review,
+        and debugging across the stack.
+    </p>
+
+    <h3>Web server</h3>
+    <p>
+      A from-scratch HTTP/1.1 server: raw socket I/O, request parsing (method, headers, body, query params, cookies), route matching with named parameters (e.g. <code>/data/:table/:row</code>), static file serving with content-type detection, session management, before/after filters, HTTPS via SSLSocket, and virtual hosting. The server uses a thread-pool model — a blocking queue of accepted connections consumed by worker threads. This is the foundation everything else runs on: KVS workers, Flame workers, the Flame coordinator, and the search server all use this web server.
+    </p>
+
+    <h3>Key-value store (KVS)</h3>
+    <p>
+      A distributed, persistent key-value store. Data is organized
+      into tables of rows, where each row has a string key and 
+      arbitrary named columns of byte arrays. Workers persist 
+      data to disk and serve it over HTTP. A coordinator tracks 
+      live workers via heartbeat pings and routes client requests 
+      using rendezvous hashing, which distributes 
+      data evenly.
+    </p>
+    <p>
+      The most impactful optimization I made was 
+      <strong>batch writing</strong>. Instead of one HTTP PUT per cell, 
+      the BatchWriter accumulates rows per worker per table, then sends 
+      them all in a single PUT with a multi-row binary payload. 
+      This reduced network round-trips by orders of magnitude and was c
+      ritical for making the indexer and crawler viable on EC2 — 
+      without it, KVS I/O was the bottleneck that made everything
+      else too slow.
+    </p>
+
+    <h3>Flame (Spark clone)</h3>
+    <p>
+      A distributed computing framework modeled on Apache Spark. 
+      The coordinator accepts JAR files, partitions work across Flame 
+      workers, and each worker pulls data from KVS, applies serialized 
+      lambdas, and writes results back. The API supports 
+      <code>flatMap</code>, <code>mapToPair</code>, 
+      <code>foldByKey</code>, <code>join</code>, 
+      <code>filter</code>, <code>sample</code>, 
+      <code>distinct</code>, <code>intersection</code>, 
+      and more.
+    </p>
+
+    <h3>Crawler</h3>
+    <p>
+      A distributed BFS-style web crawler running as a Flame job. 
+      The URL frontier is a FlameRDD that distributes URLs across 
+      workers. Each round applies a <code>flatMap</code> where 
+      workers process URLs in parallel and return newly discovered 
+      links for the next round.
+    </p>
+    <figure class="diagram" id="diagram-crawler-outer-loop">
+      <img src="../crawler_outer_loop.svg" alt="Diagram of the crawler outer loop with Flame rounds, frontier capping, checkpointing, and Bloom filter synchronization.">
+      <figcaption>Outer crawler loop in Flame: each round processes the frontier in parallel and synchronizes state before the next round.</figcaption>
+    </figure>
+    <p>
+      Key design decisions:
+    </p>
+    <ul>
+        <li><strong>Thread-local BatchWriters</strong> that accumulate 500 rows or 2 seconds of writes before flushing to KVS, dramatically reducing network calls on EC2. This was the most important one.</li>
+      <li> Given that our goal was to crawl a small subset of the web 
+        in very little time that is as relevant as possible, we 
+        enforced strict <strong>frontier capping</strong> and <strong>URL-level filtering </strong>.
+        This included a dynamic blacklist of domains and language
+        detection to focus on English pages.
+      </li>
+      <li>
+        <strong>Bloom filters</strong> for O(1) URL-seen and content-seen checks, replacing KVS lookups entirely, knowing that our 
+        set of URLs would be small enough to allow for this without significant false positive rate. Workers synchronize Bloom filters between rounds to catch cross-domain duplicates early.</li>
+      <li><strong>In-memory host cache</strong> — a ConcurrentHashMap of HostInfo objects storing robots.txt, crawl delays, and sitemap data. Since same-host URLs route to the same worker in our system, this is safe and avoids repeated KVS reads.</li>
+      <li><strong>Frontier capping</strong> at 25,000 URLs per round, with link quotas per page (3 same-domain + 5 cross-domain) to keep the crawl broad and fair.</li>
+      <li><strong>Sitemap processing</strong> from robots.txt, with sub-sitemap limits to prevent queue flooding.</li>
+      <li><strong>Checkpoint/resume</strong> — the crawler can be stopped via a KVS control signal, at which point it persists the frontier and Bloom filters, and can resume from that state later.</li>
+      <li><strong>Content filtering</strong> — HEAD-first checks for content type and size, lightweight HTML cleaning (removing scripts, styles, comments — 50–70% size reduction), and language detection to skip non-English pages. This had a cascading effect: less data to write, less data to read during indexing, and less memory pressure everywhere. It also let us successfully process JS-heavy pages like YouTube that the professor had suggested we blacklist.</li>
+    </ul>
+    <figure class="diagram" id="diagram-crawler-per-url">
+      <img src="../crawler_per_url_pipeline.svg" alt="Diagram of per-URL crawler pipeline from blacklist and Bloom checks through HEAD and GET to cleaning, language detection, and link extraction.">
+      <figcaption>Per-URL execution path used in production crawling, including filter gates, network steps, and write/extract stages.</figcaption>
+    </figure>
+
+  <section>
+    <h2>Search &amp; ranking</h2>
+    <p>
+      At query time, the search server parses the query, stems terms with Porter Stemmer, looks up the inverted index in parallel, validates phrase matches using positional data, and scores each candidate URL.
+    </p>
+    <p>
+      The score is a weighted combination: <strong>0.3 × TF-IDF + 0.7 × PageRank,</strong> with multiplicative boosts for title matches, all query terms present, homepage URLs, exact phrases, word proximity, and URL keyword matches. Penalties apply for missing titles, query-string URLs, and deep paths.
+    </p>
+  </section>
+
+
+  <section>
+    <h2>Lessons learned</h2>
+    <p>
+      Beyond learning how to implement each of these systems, the single biggest takeaway was that distributed KVS I/O dominates everything. Every optimization that mattered was about reducing the number of network round-trips to the key-value store.
+      </p>
+      <p>Writing this some months after this project, if I were 
+        to do it again, especially without the constraints of the class,
+        I would not use the Flame round-based model for crawling at all.
+        The fundamental problem is that each <code>flatMap</code> round 
+        has to wait for the slowest worker to finish before the next round
+        starts. Instead, I would implement async I/O with per-host URL
+        queues (inspired by the Mercator design) and a PageRank-priority
+        round-robin scheduler that runs continuously rather than in synchronized
+        rounds. I believe this approach, even on a single machine, would have
+        been faster than our distributed Flame version and produced a better-quality
+        corpus (because you could prioritize high-authority domains instead of relying
+        on heuristic frontier capping and link quotas).
+      </p>
+    <figure class="diagram">
+      <img src="../mercator_async_crawler.svg" alt="Diagram of a Mercator-style async crawler using a global priority queue, per-host queues, and asynchronous processing without round barriers.">
+      <figcaption>Proposed redesign: continuous async crawling with per-host queues and global priority scheduling, without round barriers.</figcaption>
+    </figure>
+    <p>
+        Additionally, I now see even more improvements I should have
+        made to the crawler. A main one is mergin the HEAD and GET
+        requests into a single streaming GET that processes the 
+        response as it downloads, with early exits for content 
+        type and size, and streaming cleanup that feeds directly 
+        into the language detector and link extractor without 
+        needing to buffer the entire raw HTML page in memory. 
+        This would have reduced latency, network usage, and 
+        memory pressure significantly, especially for large pages.
+        Here is a better system diagram reflecting these improvements:
+    </p>
+
+    <figure class="diagram">
+      <img src="../optimized_page_processing.svg" alt="Diagram of optimized page-processing pipeline with merged in-memory gates, streaming GET, stream-cleaning, and parallel post-processing.">
+      <figcaption>Optimized page-processing pipeline: fewer gates, streaming cleanup during download, and parallel extraction plus batched writes.</figcaption>
+    </figure>
+    
+  </section>
+
+  <section>
+    <h2>Skills &amp; tools</h2>
+    <p>Java · Distributed Systems · MapReduce · HTTP/1.1 · TCP Sockets · AWS EC2 · Key-Value Stores · Bloom Filters · TF-IDF · PageRank · Porter Stemming · HTML/CSS/JS</p>
+  </section>
+
+  <!-- Giggle-style pagination -->
+  <div class="giggle-pagination">
+    <span class="gp-g">G</span><span class="gp-i">i</span><span class="gp-g2">g</span><span class="gp-g3">g</span><span class="gp-g4">g</span><span class="gp-g5">g</span><span class="gp-l">l</span><span class="gp-e">e</span>
+  </div>
+
+  <svg class="smile-footer" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="10"></circle>
+    <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+    <line x1="9" y1="9" x2="9.01" y2="9"></line>
+    <line x1="15" y1="9" x2="15.01" y2="9"></line>
+  </svg>
+
+
+<footer>
+    <p style="text-align: center;">CIS 5550: Internet Systems · University of Pennsylvania · Fall 2025</p>
+    <p style="text-align: center;">Team: Jaime Walter, Sean D, Rania S, Maxwell Y</p>
+    <p style="text-align: center; margin-top: 0.5rem; font-style: italic; font-size: 0.8rem;">The source code is not publicly available as this is a class project, but more information can be provided upon request.</p>
+</footer>
+
+  </div><!-- end results-container -->
+
+</body>
+</html>
