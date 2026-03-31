@@ -150,6 +150,56 @@
       object-position: top center;
       background: linear-gradient(to bottom, var(--white), var(--yellow-50));
     }
+    .at-a-glance {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.5rem;
+      margin: 0 0 0.8rem;
+    }
+    .glance-item {
+      border: 1px solid var(--yellow-200);
+      background: var(--white);
+      border-radius: 0.45rem;
+      padding: 0.45rem 0.55rem 0.5rem;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    .glance-metric {
+      color: var(--blue-700);
+      font-size: 0.9rem;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+    .glance-label {
+      color: var(--gray-600);
+      font-size: 0.72rem;
+      line-height: 1.25;
+      margin-top: 0.2rem;
+    }
+    .intro-list {
+      margin-top: 0.25rem;
+      margin-bottom: 0.8rem;
+    }
+    .quick-scan-line {
+      color: var(--gray-700);
+      font-size: 0.87rem;
+      margin: 0 0 0.6rem;
+    }
+    .quick-skills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-bottom: 1.45rem;
+    }
+    .skill-chip {
+      border: 1px solid var(--yellow-200);
+      background: var(--white);
+      color: var(--gray-700);
+      border-radius: 9999px;
+      padding: 0.22rem 0.52rem;
+      font-size: 0.73rem;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
 
     /* Header block — styled as the top search result */
     header {
@@ -313,6 +363,9 @@
       .logo-small { font-size: 1.4rem; }
       .logo-smile-small { width: 1.5rem; height: 1.5rem; }
       .fake-search-input { padding: 0.9rem 1rem 0.9rem 2.8rem; font-size: 0.95rem; }
+      .at-a-glance {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
     }
   </style>
 </head>
@@ -355,26 +408,62 @@
     </div>
 
   <header>
-    <h1>Giggle: A Distributed Search Engine from Scratch</h1>
+    <h1>Giggle: A Distributed Search Engine</h1>
     <p>CIS 5550 Internet and Web Systems · Fall 2025 · University of Pennsylvania</p>
     <p>Jaime Walter · Sean D · Rania S · Maxwell Y</p>
   </header>
+  <div class="at-a-glance" aria-label="Project highlights">
+    
+    <div class="glance-item">
+      <div class="glance-metric">From-scratch Java</div>
+      <div class="glance-label">Own server, KVS, Spark clone</div>
+    </div>
+    <div class="glance-item">
+      <div class="glance-metric">AWS EC2</div>
+      <div class="glance-label">5-worker deployment</div>
+    </div>
+    <div class="glance-item">
+      <div class="glance-metric">500k pages</div>
+      <div class="glance-label">Crawled in under 8 hours</div>
+    </div>
+    <div class="glance-item">
+      <div class="glance-metric">23ms avg latency</div>
+      <div class="glance-label">Search response time</div>
+    </div>
+
+  </div>
+  <p class="quick-scan-line"><strong>Skills at a glance:</strong></p>
+  <div class="quick-skills" aria-label="Skills used in this project">
+    <span class="skill-chip">Java</span>
+    <span class="skill-chip">Apache Spark</span>
+    <span class="skill-chip">Internet protocols</span>
+    <span class="skill-chip">TCP Sockets</span>
+    <span class="skill-chip">AWS EC2</span>
+    <span class="skill-chip">KVS</span>
+
+  </div>
 
   <section>
     <h2>The project</h2>
     <p>
-        Together with my team, I built a web search engine as the final project for CIS 5550 (Internet and Web Systems). The system crawls the web, indexes pages, computes PageRank, and serves ranked results through a Google-style frontend. Every layer was written from scratch in Java and deployed on AWS EC2.
+      <strong>What we built:</strong> a full web search engine for that crawls the web, indexes pages, computes PageRank, and serves ranked results, all implemented from scratch in Java and deployed on AWS EC2.
     </p>
     <p>
-      By the end, we had crawled <strong>500k pages</strong> (300k with valid HTML content) across 5 EC2 workers in under 8 hours, and served search results in an average of <strong>23 milliseconds</strong>.
+      <strong>Outcome:</strong> we crawled <strong>500k pages</strong> (300k with valid HTML content) across 5 EC2 workers in under 8 hours, and served search results in an average of <strong>23 milliseconds</strong>.
     </p>
   </section>
 
   <section>
     <h2>Architecture</h2>
     <p>
-      The system is a four-layer stack. At the bottom, a <strong>custom web server</strong> handles HTTP parsing, routing, static files, and sessions. On top of that, a <strong>distributed key-value store (KVS)</strong> provides persistent, partitioned storage across workers. Above KVS sits <strong>Flame</strong>, our Apache-Spark-like distributed computing framework that lets you write MapReduce-style jobs using RDDs and PairRDDs. Finally, the application layer runs four jobs — <strong>Crawler, Indexer, PageRank, and SearchServer</strong> — all built on Flame and KVS.
+      The system is a four-layer stack:
     </p>
+    <ul class="intro-list">
+      <li><strong>Web server:</strong> handles HTTP parsing, routing, static files, sessions, and worker/coordinator endpoints.</li>
+      <li><strong>Distributed KVS:</strong> provides persistent, partitioned storage across workers.</li>
+      <li><strong>Flame:</strong> a Spark-like distributed compute framework with RDD and PairRDD-style operations.</li>
+      <li><strong>Application jobs:</strong> Crawler, Indexer, PageRank, and SearchServer, all built on Flame + KVS.</li>
+    </ul>
     <p>
       The crawler feeds into the indexer, the indexer feeds into PageRank, and all three produce tables that the search server queries at runtime. The frontend is a vanilla HTML/CSS/JS client that talks to the search server over REST.
     </p>
@@ -384,11 +473,13 @@
     <h2>What I built</h2>
 
     <p>
-        My main focus was optimizing the base components (web server,
-        KVS, Flame) from the homework version, building the
-        crawler, and AWS EC2 deployment. I also contributed to design choices, code review,
-        and debugging across the stack.
+      My main focus was performance and reliability across the infrastructure and crawling pipeline.
     </p>
+    <ul class="intro-list">
+      <li><strong>Optimized:</strong> web server, KVS, and Flame from the homework baseline.</li>
+      <li><strong>Built:</strong> the crawler pipeline.</li>
+      <li><strong>Operated:</strong> AWS EC2 deployment, plus code reviews and debugging accross the project.</li>
+    </ul>
 
     <h3>Web server</h3>
     <p>
@@ -407,7 +498,7 @@
     </p>
     <p>
       The most impactful optimization I made was 
-      <strong>batch writing</strong>. Instead of one HTTP PUT per cell, 
+      batch writing. Instead of one HTTP PUT per cell, 
       the BatchWriter accumulates rows per worker per table, then sends 
       them all in a single PUT with a multi-row binary payload. 
       This reduced network round-trips by orders of magnitude and was c
