@@ -1,5 +1,4 @@
 :root {
-    --ui-scale: 1.3;
     --bg: #f6f8fc;
     --text: #1d2636;
     --muted: #5f6e85;
@@ -31,32 +30,32 @@
     box-sizing: border-box;
 }
 
+html {
+    width: 100%;
+    height: 100%;
+}
+
 body {
     background: var(--bg);
     color: var(--text);
     font-family: 'Courier New', Courier, monospace;
     font-size: 14px;
     line-height: 1.5;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
+    min-height: 100dvh;
     overflow: hidden;
     user-select: none;
-    zoom: var(--ui-scale);
-}
-
-@supports not (zoom: 1) {
-    body {
-        transform: scale(var(--ui-scale));
-        transform-origin: top left;
-        width: calc(100vw / var(--ui-scale));
-        height: calc(100vh / var(--ui-scale));
-    }
+    text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
 }
 
 /* ─── TMUX LAYOUT ─── */
 .tmux-root {
     display: flex;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
+    min-height: 100dvh;
     border: 1px solid var(--border);
 }
 
@@ -220,13 +219,14 @@ body {
 
 /* section header */
 .section-label {
-    color: var(--muted);
-    font-size: 11px;
+    color: var(--accent);
+    font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 2px;
     margin: 28px 0 6px;
     border-bottom: 1px solid var(--border);
     padding-bottom: 3px;
+    font-weight: bold;
 }
 
 .section-label:first-of-type {
