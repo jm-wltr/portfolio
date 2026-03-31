@@ -318,6 +318,43 @@ const previewFrame = document.getElementById('previewFrame');
 const previewTitle = document.getElementById('previewTitle');
 const closePreview = document.getElementById('closePreview');
 
+function forceExternalLinksToPopup(doc) {
+    if (!doc) return;
+
+    const links = doc.querySelectorAll('a[href]');
+    links.forEach((link) => {
+        const rawHref = link.getAttribute('href');
+        if (!rawHref) return;
+        if (rawHref.startsWith('#') || rawHref.startsWith('mailto:') || rawHref.startsWith('tel:')) return;
+
+        let url;
+        try {
+            url = new URL(rawHref, doc.baseURI);
+        } catch {
+            return;
+        }
+
+        const isHttp = url.protocol === 'http:' || url.protocol === 'https:';
+        const isExternal = isHttp && url.origin !== window.location.origin;
+        if (!isExternal) return;
+
+        link.setAttribute('target', '_blank');
+        link.setAttribute('rel', 'noopener noreferrer');
+    });
+}
+
+forceExternalLinksToPopup(document);
+
+if (previewFrame) {
+    previewFrame.addEventListener('load', () => {
+        try {
+            forceExternalLinksToPopup(previewFrame.contentDocument);
+        } catch {
+            // Ignore cases where iframe content is not accessible.
+        }
+    });
+}
+
 const navItems = Array.from(document.querySelectorAll('.nav-item[data-project]'));
 let focusIdx = 0;
 
