@@ -45,7 +45,7 @@ body {
     height: 100%;
     min-height: 100dvh;
     overflow: hidden;
-    user-select: none;
+    user-select: text;
     text-size-adjust: 100%;
     -webkit-text-size-adjust: 100%;
 }
@@ -195,6 +195,8 @@ body {
         1px 1px 0 var(--shadow);
     /* prevent any overflow from ever showing */
     max-width: 100%;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 /* ─── TERMINAL BODY (plaintext layout) ─── */

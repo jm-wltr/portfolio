@@ -399,10 +399,10 @@
     <div class="image-previews" aria-label="Image results previews">
       <div class="image-preview-grid">
         <a class="preview-card" href="#diagram-crawler-outer-loop" aria-label="Jump to crawler outer loop diagram">
-          <img class="preview-thumb" src="../crawler_outer_loop.svg" alt="Mini preview of crawler outer loop diagram">
+          <img class="preview-thumb" src="assets/giggle/crawler_outer_loop.svg" alt="Mini preview of crawler outer loop diagram">
         </a>
         <a class="preview-card" href="#diagram-crawler-per-url" aria-label="Jump to crawler per-URL pipeline diagram">
-          <img class="preview-thumb" src="../crawler_per_url_pipeline.svg" alt="Mini preview of per-URL crawler pipeline diagram">
+          <img class="preview-thumb" src="assets/giggle/crawler_per_url_pipeline.svg" alt="Mini preview of per-URL crawler pipeline diagram">
         </a>
       </div>
     </div>
@@ -529,7 +529,7 @@
       links for the next round.
     </p>
     <figure class="diagram" id="diagram-crawler-outer-loop">
-      <img src="../crawler_outer_loop.svg" alt="Diagram of the crawler outer loop with Flame rounds, frontier capping, checkpointing, and Bloom filter synchronization.">
+      <img src="assets/giggle/crawler_outer_loop.svg" alt="Diagram of the crawler outer loop with Flame rounds, frontier capping, checkpointing, and Bloom filter synchronization.">
       <figcaption>Outer crawler loop in Flame: each round processes the frontier in parallel and synchronizes state before the next round.</figcaption>
     </figure>
     <p>
@@ -553,7 +553,7 @@
       <li><strong>Content filtering</strong> — HEAD-first checks for content type and size, lightweight HTML cleaning (removing scripts, styles, comments — 50–70% size reduction), and language detection to skip non-English pages. This had a cascading effect: less data to write, less data to read during indexing, and less memory pressure everywhere. It also let us successfully process JS-heavy pages like YouTube that the professor had suggested we blacklist.</li>
     </ul>
     <figure class="diagram" id="diagram-crawler-per-url">
-      <img src="../crawler_per_url_pipeline.svg" alt="Diagram of per-URL crawler pipeline from blacklist and Bloom checks through HEAD and GET to cleaning, language detection, and link extraction.">
+      <img src="assets/giggle/crawler_per_url_pipeline.svg" alt="Diagram of per-URL crawler pipeline from blacklist and Bloom checks through HEAD and GET to cleaning, language detection, and link extraction.">
       <figcaption>Per-URL execution path used in production crawling, including filter gates, network steps, and write/extract stages.</figcaption>
     </figure>
 
@@ -587,7 +587,7 @@
         on heuristic frontier capping and link quotas).
       </p>
     <figure class="diagram">
-      <img src="../mercator_async_crawler.svg" alt="Diagram of a Mercator-style async crawler using a global priority queue, per-host queues, and asynchronous processing without round barriers.">
+      <img src="assets/giggle/mercator_async_crawler.svg" alt="Diagram of a Mercator-style async crawler using a global priority queue, per-host queues, and asynchronous processing without round barriers.">
       <figcaption>Proposed redesign: continuous async crawling with per-host queues and global priority scheduling, without round barriers.</figcaption>
     </figure>
     <p>
@@ -604,7 +604,7 @@
     </p>
 
     <figure class="diagram">
-      <img src="../optimized_page_processing.svg" alt="Diagram of optimized page-processing pipeline with merged in-memory gates, streaming GET, stream-cleaning, and parallel post-processing.">
+      <img src="assets/giggle/optimized_page_processing.svg" alt="Diagram of optimized page-processing pipeline with merged in-memory gates, streaming GET, stream-cleaning, and parallel post-processing.">
       <figcaption>Optimized page-processing pipeline: fewer gates, streaming cleanup during download, and parallel extraction plus batched writes.</figcaption>
     </figure>
     

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pose Ninja — Jaime Walter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #272727;
+      --bg-card: #1e1e1e;
+      --bg-surface: #333333;
+      --blue: #4F94F6;
+      --blue-dim: #3a6fbf;
+      --blue-glow: rgba(79, 148, 246, 0.15);
+      --green: #AFFB5B;
+      --green-dim: #8ad44a;
+      --green-glow: rgba(175, 251, 91, 0.15);
+      --text: #ffffff;
+      --text-dim: #dddddd;
+      --text-muted: #aaaaaa;
+      --border: #444444;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Chakra Petch', 'Segoe UI', sans-serif;
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    .wrap {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 1.5rem clamp(1rem, 4vw, 3rem) 2rem;
+    }
+
+    /* ── header ── */
+    header {
+      padding-bottom: 1rem;
+      border-bottom: 2px solid var(--blue);
+      margin-bottom: 1rem;
+    }
+    header h1 {
+      font-family: 'Chakra Petch', sans-serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--green);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 0.3rem;
+    }
+    header p {
+      color: var(--text-dim);
+      font-size: 0.88rem;
+      margin-bottom: 0.15rem;
+    }
+    header p:first-of-type {
+      color: var(--text);
+      font-size: 1rem;
+      font-weight: 600;
+    }
+    .links {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.8rem;
+    }
+    .links a {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 0.4rem 0.9rem;
+      color: var(--bg);
+      background: var(--blue);
+      text-decoration: none;
+      border: none;
+    }
+    .links a:nth-child(2) {
+      background: var(--bg-surface);
+      color: var(--blue);
+      border: 1.5px solid var(--blue);
+    }
+    .links a:hover {
+      opacity: 0.85;
+    }
+
+    /* ── video ── */
+    video {
+      display: block;
+      width: 100%;
+      max-width: 760px;
+      height: auto;
+      margin: 0 0 1rem;
+      border: 2px solid var(--border);
+    }
+
+    /* ── sections ── */
+    section {
+      margin-bottom: 1.2rem;
+      padding-bottom: 1.2rem;
+      border-bottom: 1px solid var(--border);
+    }
+    section:last-of-type {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    h2 {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--blue);
+      margin-bottom: 0.6rem;
+    }
+
+    p {
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+    strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+    a {
+      color: var(--blue);
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+
+    /* ── feature list ── */
+    ul {
+      list-style: none;
+      margin: 0;
+    }
+    li {
+      padding: 0.6rem 0.8rem;
+      margin-bottom: 0.4rem;
+      background: var(--bg-card);
+      border-left: 3px solid var(--green);
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+    li strong {
+      color: var(--green);
+      font-weight: 600;
+    }
+
+    /* ── skills ── */
+    .skills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+    .skills span {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.68rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 0.3rem 0.7rem;
+      color: var(--green);
+      border: 1px solid var(--green-dim);
+      background: var(--green-glow);
+    }
+
+    /* ── footer ── */
+    footer {
+      padding-top: 1.2rem;
+      border-top: 2px solid var(--blue);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    footer p {
+      color: var(--text-muted);
+      margin-bottom: 0.3rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <header>
+      <h1>Pose Ninja</h1>
+      <p>A webcam-powered action game where your body is the controller</p>
+      <p>CIS 5810 Computer Vision · Fall 2025 · University of Pennsylvania</p>
+      <p>Jaime Walter · Jay Katyan · Kristian Prifti</p>
+      <div class="links">
+        <a href="https://jm-wltr.itch.io/pose-ninja">Download free on itch.io</a>
+      </div>
+    </header>
+
+    <video autoplay loop muted playsinline>
+      <source src="assets/poseninja/cis5810small.mp4" type="video/mp4">
+    </video>
+
+    <section>
+      <h2>What it is</h2>
+      <p>
+        A Fruit-Ninja-inspired game that uses <strong>real-time computer vision</strong> to turn your body into the controller. A webcam tracks your pose, renders your silhouette on screen, and you physically move to hit targets and dodge bombs. Supports single-player (three modes) and <strong>1v1 split-screen</strong>. Released as a standalone <strong>macOS and Windows app</strong> on itch.io.
+      </p>
+    </section>
+
+    <section>
+      <h2>What I built</h2>
+      <ul>
+        <li><strong>Real-time pose tracking</strong> — MediaPipe Holistic for body landmarks at 30fps with position smoothing to reduce jitter.</li>
+        <li><strong>Body segmentation</strong> — YOLOv8 running in a background thread for pixel-level silhouette rendering and bomb collision detection.</li>
+        <li><strong>Gesture-driven UI</strong> — full menu system controlled by fist open/close detection via MediaPipe Hands. No mouse needed.</li>
+        <li><strong>Cross-platform packaging</strong> — bundled as native .app (macOS) and .exe (Windows) via PyInstaller, including YOLO weights and MediaPipe modules.</li>
+        <li><strong>2-player split-screen</strong> — independent pose trackers, per-player segmentation masks, and separate game state for simultaneous play from a single webcam.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Skills &amp; tools</h2>
+      <div class="skills">
+        <span>Python</span>
+        <span>Computer Vision</span>
+        <span>MediaPipe</span>
+        <span>YOLOv8</span>
+        <span>OpenCV</span>
+        <span>PyQt5</span>
+        <span>PyInstaller</span>
+        <span>Real-Time Systems</span>
+        <span>Multithreading</span>
+        <span>Pygame</span>
+      </div>
+    </section>
+
+    <footer>
+      <p>CIS 5810: Computer Vision · University of Pennsylvania · Fall 2025</p>
+      <p>Jaime Walter, Jay Katyan, Kristian Prifti</p>
+      <p style="margin-top: 0.4rem; font-style: italic; font-size: 0.72rem;">Source code is not publicly available as this is a class project, but more information can be provided upon request.</p>
+    </footer>
+
+  </div>
+</body>
+</html>

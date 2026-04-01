@@ -4,5 +4,6 @@
 // ─────────────────────────────────────────────
 const PROJECT_PATHS = {
     csic: "projects/csic.html",
-    giggle: "projects/giggle.html"
+    giggle: "projects/giggle.html",
+    poseninja: "projects/poseninja.html"
 };
